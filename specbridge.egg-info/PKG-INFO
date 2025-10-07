@@ -1,0 +1,49 @@
+Metadata-Version: 2.4
+Name: specbridge
+Version: 0.1.0
+Summary: DreaMS-conditioned SpecBridge: spectra->molecule mapping and conditioning
+Author: SpecBridge
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: torch>=2.1
+Requires-Dist: numpy>=1.24
+Requires-Dist: pyteomics>=4.7.5
+Provides-Extra: rdkit
+Requires-Dist: rdkit-pypi>=2022.9.5; extra == "rdkit"
+Provides-Extra: dreams
+Requires-Dist: wandb>=0.16.4; extra == "dreams"
+
+# SpecBridge
+
+SpecBridge provides a DreaMS-conditioned adapter for spectra->molecule mapping and a training pipeline with synthetic and real (MGF) data.
+
+## Install (editable)
+
+```bash
+pip install -e .
+```
+
+## CLI
+
+```bash
+specbridge --help
+```
+
+- Synthetic demo:
+```bash
+specbridge --demo --steps 200
+```
+- Real training:
+```bash
+specbridge \
+  --mgf /path/to/data.mgf \
+  --dreams-ckpt /path/to/ssl_model.ckpt \
+  --batch-size 64 --epochs 1 --log-every 50
+```
+
+## Legacy script (still runnable)
+
+```bash
+python specbridge_entry.py --demo --steps 200
+```
+

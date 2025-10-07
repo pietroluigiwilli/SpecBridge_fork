@@ -1,0 +1,9 @@
+torch>=2.1
+numpy>=1.24
+pyteomics>=4.7.5
+
+[dreams]
+wandb>=0.16.4
+
+[rdkit]
+rdkit-pypi>=2022.9.5

@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "specbridge"
+version = "0.1.0"
+description = "DreaMS-conditioned SpecBridge: spectra->molecule mapping and conditioning"
+authors = [{name = "SpecBridge"}]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "torch>=2.1",
+  "numpy>=1.24",
+  "pyteomics>=4.7.5",
+]
+
+[project.optional-dependencies]
+rdkit = ["rdkit-pypi>=2022.9.5"]
+dreams = ["wandb>=0.16.4"]
+
+[project.scripts]
+specbridge = "specbridge.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["specbridge*"]
+exclude = ["data*", "DreaMS*"]
+

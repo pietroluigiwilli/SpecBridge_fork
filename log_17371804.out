@@ -1,0 +1,455 @@
+[dataset] records=194119 | train=194119 | formulas=17634 | adducts=2 | charges=1
+[dataset] records=194119 | train=194119 | formulas=17634 | adducts=2 | charges=1 | preview_unique_smiles=131 | '#C'=0
+[device] cuda_available= True device= cuda model= cuda:0 dreams= cuda:0
+step 00050 | total 8.3165 | L_con 4.1799 | L_con_m 4.1435 | L_map 0.0010 | L_sup 4.1680 | L_ortho 0.000000 | L_hard 2.831911 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.031 | cos(+) -0.000 | cos(-) -0.001 | ln(B) 4.159
+step 00100 | total 8.1381 | L_con 4.0692 | L_con_m 4.0780 | L_map 0.0010 | L_sup 4.0552 | L_ortho 0.000000 | L_hard 2.787162 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.016 | cos(+) 0.004 | cos(-) -0.005 | ln(B) 4.159
+step 00150 | total 7.9960 | L_con 3.9921 | L_con_m 4.0121 | L_map 0.0010 | L_sup 3.9790 | L_ortho 0.000000 | L_hard 2.801875 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.031 | cos(+) 0.014 | cos(-) -0.002 | ln(B) 4.159
+step 00200 | total 7.8788 | L_con 3.9464 | L_con_m 3.9382 | L_map 0.0010 | L_sup 3.9358 | L_ortho 0.000000 | L_hard 2.663470 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.062 | cos(+) 0.026 | cos(-) 0.005 | ln(B) 4.159
+[val] step 200 | val_acc=0.0000 | IMPROVED
+step 00250 | total 7.4076 | L_con 3.8081 | L_con_m 3.6131 | L_map 0.0009 | L_sup 3.7901 | L_ortho 0.000000 | L_hard 2.564312 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.047 | cos(+) 0.046 | cos(-) 0.007 | ln(B) 4.159
+step 00300 | total 7.1052 | L_con 3.6503 | L_con_m 3.4868 | L_map 0.0008 | L_sup 3.6143 | L_ortho 0.000000 | L_hard 2.506872 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.078 | cos(+) 0.071 | cos(-) 0.009 | ln(B) 4.159
+step 00350 | total 7.4150 | L_con 3.8690 | L_con_m 3.6252 | L_map 0.0008 | L_sup 3.7857 | L_ortho 0.000000 | L_hard 2.535529 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.016 | cos(+) 0.077 | cos(-) 0.029 | ln(B) 4.159
+step 00400 | total 6.9138 | L_con 3.6514 | L_con_m 3.3240 | L_map 0.0008 | L_sup 3.5860 | L_ortho 0.000000 | L_hard 2.485532 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.122 | cos(-) 0.053 | ln(B) 4.159
+[val] step 400 | val_acc=0.0312 | IMPROVED
+step 00450 | total 7.0586 | L_con 3.7007 | L_con_m 3.4351 | L_map 0.0008 | L_sup 3.6196 | L_ortho 0.000000 | L_hard 2.469823 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.047 | cos(+) 0.100 | cos(-) 0.028 | ln(B) 4.159
+step 00500 | total 6.9042 | L_con 3.5196 | L_con_m 3.3834 | L_map 0.0008 | L_sup 3.5170 | L_ortho 0.000000 | L_hard 2.632003 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.078 | cos(+) 0.117 | cos(-) 0.015 | ln(B) 4.159
+step 00550 | total 5.9679 | L_con 3.1171 | L_con_m 2.8725 | L_map 0.0007 | L_sup 3.0917 | L_ortho 0.000000 | L_hard 2.265335 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.164 | cos(-) 0.023 | ln(B) 4.159
+step 00600 | total 6.0860 | L_con 3.1885 | L_con_m 2.8937 | L_map 0.0007 | L_sup 3.1886 | L_ortho 0.000000 | L_hard 2.119990 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.144 | cos(-) 0.007 | ln(B) 4.159
+[val] step 600 | val_acc=0.0469 | IMPROVED
+step 00650 | total 7.2806 | L_con 3.8249 | L_con_m 3.6211 | L_map 0.0008 | L_sup 3.6556 | L_ortho 0.000000 | L_hard 2.850852 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.078 | cos(+) 0.120 | cos(-) 0.045 | ln(B) 4.159
+step 00700 | total 6.7741 | L_con 3.5221 | L_con_m 3.2585 | L_map 0.0008 | L_sup 3.5118 | L_ortho 0.000000 | L_hard 2.467833 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.031 | cos(+) 0.136 | cos(-) 0.036 | ln(B) 4.159
+step 00750 | total 6.4372 | L_con 3.3132 | L_con_m 3.1393 | L_map 0.0008 | L_sup 3.2941 | L_ortho 0.000000 | L_hard 2.235754 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.147 | cos(-) 0.029 | ln(B) 4.159
+step 00800 | total 7.0960 | L_con 3.7294 | L_con_m 3.5016 | L_map 0.0008 | L_sup 3.5903 | L_ortho 0.000000 | L_hard 2.528844 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.062 | cos(+) 0.123 | cos(-) 0.047 | ln(B) 4.159
+[val] step 800 | val_acc=0.0469 | no-improve (1/50)
+step 00850 | total 6.2808 | L_con 3.2959 | L_con_m 3.0247 | L_map 0.0008 | L_sup 3.2523 | L_ortho 0.000000 | L_hard 2.205227 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.162 | cos(-) 0.040 | ln(B) 4.159
+step 00900 | total 6.3321 | L_con 3.3101 | L_con_m 3.1230 | L_map 0.0008 | L_sup 3.2052 | L_ortho 0.000000 | L_hard 2.353368 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.159 | cos(-) 0.034 | ln(B) 4.159
+step 00950 | total 6.2845 | L_con 3.2356 | L_con_m 3.1214 | L_map 0.0008 | L_sup 3.1594 | L_ortho 0.000000 | L_hard 2.299996 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.078 | cos(+) 0.184 | cos(-) 0.036 | ln(B) 4.159
+step 01000 | total 5.9700 | L_con 3.0425 | L_con_m 2.9539 | L_map 0.0007 | L_sup 3.0124 | L_ortho 0.000000 | L_hard 2.215436 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.224 | cos(-) 0.046 | ln(B) 4.159
+[val] step 1000 | val_acc=0.0625 | IMPROVED
+step 01050 | total 6.4432 | L_con 3.2568 | L_con_m 3.2353 | L_map 0.0008 | L_sup 3.2039 | L_ortho 0.000000 | L_hard 2.511394 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.167 | cos(-) 0.033 | ln(B) 4.159
+step 01100 | total 6.3778 | L_con 3.3180 | L_con_m 3.1237 | L_map 0.0008 | L_sup 3.2502 | L_ortho 0.000000 | L_hard 2.277932 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.191 | cos(-) 0.053 | ln(B) 4.159
+step 01150 | total 5.3310 | L_con 2.7028 | L_con_m 2.6462 | L_map 0.0007 | L_sup 2.6813 | L_ortho 0.000000 | L_hard 2.170563 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.268 | cos(-) 0.048 | ln(B) 4.159
+step 01200 | total 6.1668 | L_con 3.1652 | L_con_m 3.0508 | L_map 0.0007 | L_sup 3.1124 | L_ortho 0.000000 | L_hard 2.341249 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.228 | cos(-) 0.044 | ln(B) 4.159
+[val] step 1200 | val_acc=0.0469 | no-improve (1/50)
+step 01250 | total 6.1322 | L_con 3.1365 | L_con_m 3.0298 | L_map 0.0007 | L_sup 3.0987 | L_ortho 0.000000 | L_hard 2.263736 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.238 | cos(-) 0.070 | ln(B) 4.159
+step 01300 | total 5.4497 | L_con 2.8238 | L_con_m 2.6461 | L_map 0.0007 | L_sup 2.8001 | L_ortho 0.000000 | L_hard 2.000557 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.261 | cos(-) 0.057 | ln(B) 4.159
+step 01350 | total 6.3915 | L_con 3.1915 | L_con_m 3.2065 | L_map 0.0007 | L_sup 3.1813 | L_ortho 0.000000 | L_hard 2.355832 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.227 | cos(-) 0.064 | ln(B) 4.159
+step 01400 | total 6.2011 | L_con 3.1122 | L_con_m 3.0877 | L_map 0.0007 | L_sup 3.1097 | L_ortho 0.000000 | L_hard 2.390444 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.224 | cos(-) 0.036 | ln(B) 4.159
+[val] step 1400 | val_acc=0.0625 | no-improve (2/50)
+step 01450 | total 5.7158 | L_con 2.9199 | L_con_m 2.8147 | L_map 0.0007 | L_sup 2.8976 | L_ortho 0.000000 | L_hard 2.139737 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.258 | cos(-) 0.053 | ln(B) 4.159
+step 01500 | total 6.8023 | L_con 3.4978 | L_con_m 3.3682 | L_map 0.0008 | L_sup 3.4303 | L_ortho 0.000000 | L_hard 2.584677 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.195 | cos(-) 0.041 | ln(B) 4.159
+step 01550 | total 6.1246 | L_con 3.0533 | L_con_m 3.0419 | L_map 0.0007 | L_sup 3.0790 | L_ortho 0.000000 | L_hard 2.291070 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.245 | cos(-) 0.063 | ln(B) 4.159
+step 01600 | total 5.3432 | L_con 2.7559 | L_con_m 2.6589 | L_map 0.0007 | L_sup 2.6808 | L_ortho 0.000000 | L_hard 2.051522 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.276 | cos(-) 0.057 | ln(B) 4.159
+[val] step 1600 | val_acc=0.0625 | no-improve (3/50)
+step 01650 | total 5.0853 | L_con 2.5848 | L_con_m 2.5600 | L_map 0.0007 | L_sup 2.5219 | L_ortho 0.000000 | L_hard 2.077669 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.297 | cos(-) 0.041 | ln(B) 4.159
+step 01700 | total 6.6452 | L_con 3.4772 | L_con_m 3.3516 | L_map 0.0007 | L_sup 3.2899 | L_ortho 0.000000 | L_hard 2.527734 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.263 | cos(-) 0.122 | ln(B) 4.159
+step 01750 | total 5.8513 | L_con 3.0416 | L_con_m 2.9118 | L_map 0.0007 | L_sup 2.9361 | L_ortho 0.000000 | L_hard 2.182096 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.272 | cos(-) 0.079 | ln(B) 4.159
+step 01800 | total 5.8955 | L_con 3.0153 | L_con_m 2.9957 | L_map 0.0007 | L_sup 2.8962 | L_ortho 0.000000 | L_hard 2.024184 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.268 | cos(-) 0.043 | ln(B) 4.159
+[val] step 1800 | val_acc=0.0625 | no-improve (4/50)
+step 01850 | total 6.0314 | L_con 3.1582 | L_con_m 3.1053 | L_map 0.0007 | L_sup 2.9224 | L_ortho 0.000000 | L_hard 2.416933 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.248 | cos(-) 0.049 | ln(B) 4.159
+step 01900 | total 5.8964 | L_con 3.0883 | L_con_m 2.9686 | L_map 0.0007 | L_sup 2.9243 | L_ortho 0.000000 | L_hard 2.275708 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.078 | cos(+) 0.270 | cos(-) 0.069 | ln(B) 4.159
+step 01950 | total 6.4487 | L_con 3.2980 | L_con_m 3.2796 | L_map 0.0007 | L_sup 3.1655 | L_ortho 0.000000 | L_hard 2.417868 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.261 | cos(-) 0.083 | ln(B) 4.159
+step 02000 | total 5.6613 | L_con 2.9129 | L_con_m 2.9028 | L_map 0.0007 | L_sup 2.7551 | L_ortho 0.000000 | L_hard 2.198025 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.078 | cos(+) 0.302 | cos(-) 0.063 | ln(B) 4.159
+[val] step 2000 | val_acc=0.0469 | no-improve (5/50)
+step 02050 | total 6.2867 | L_con 3.2482 | L_con_m 3.2497 | L_map 0.0007 | L_sup 3.0333 | L_ortho 0.000000 | L_hard 2.224223 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.261 | cos(-) 0.065 | ln(B) 4.159
+step 02100 | total 5.3334 | L_con 2.6964 | L_con_m 2.7420 | L_map 0.0007 | L_sup 2.5880 | L_ortho 0.000000 | L_hard 2.103613 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.306 | cos(-) 0.053 | ln(B) 4.159
+step 02150 | total 5.7729 | L_con 2.8963 | L_con_m 2.9321 | L_map 0.0007 | L_sup 2.8374 | L_ortho 0.000000 | L_hard 2.324807 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.300 | cos(-) 0.075 | ln(B) 4.159
+step 02200 | total 5.8559 | L_con 2.9609 | L_con_m 3.0080 | L_map 0.0007 | L_sup 2.8444 | L_ortho 0.000000 | L_hard 2.199919 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.309 | cos(-) 0.095 | ln(B) 4.159
+[val] step 2200 | val_acc=0.0469 | no-improve (6/50)
+step 02250 | total 6.7459 | L_con 3.5950 | L_con_m 3.4285 | L_map 0.0007 | L_sup 3.3137 | L_ortho 0.000000 | L_hard 2.614482 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.078 | cos(+) 0.265 | cos(-) 0.064 | ln(B) 4.159
+step 02300 | total 6.3579 | L_con 3.2978 | L_con_m 3.1816 | L_map 0.0007 | L_sup 3.1728 | L_ortho 0.000000 | L_hard 2.302116 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.286 | cos(-) 0.126 | ln(B) 4.159
+step 02350 | total 6.6819 | L_con 3.3729 | L_con_m 3.3195 | L_map 0.0007 | L_sup 3.3588 | L_ortho 0.000000 | L_hard 2.395092 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.288 | cos(-) 0.136 | ln(B) 4.159
+step 02400 | total 6.2120 | L_con 3.1820 | L_con_m 3.1726 | L_map 0.0007 | L_sup 3.0359 | L_ortho 0.000000 | L_hard 2.480165 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.285 | cos(-) 0.094 | ln(B) 4.159
+[val] step 2400 | val_acc=0.0312 | no-improve (7/50)
+step 02450 | total 5.1881 | L_con 2.6189 | L_con_m 2.6332 | L_map 0.0007 | L_sup 2.5516 | L_ortho 0.000000 | L_hard 2.159876 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.352 | cos(-) 0.081 | ln(B) 4.159
+step 02500 | total 5.6857 | L_con 2.8886 | L_con_m 2.8936 | L_map 0.0007 | L_sup 2.7886 | L_ortho 0.000000 | L_hard 2.436910 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.311 | cos(-) 0.063 | ln(B) 4.159
+step 02550 | total 5.5772 | L_con 2.7902 | L_con_m 2.8091 | L_map 0.0007 | L_sup 2.7647 | L_ortho 0.000000 | L_hard 2.036219 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.340 | cos(-) 0.080 | ln(B) 4.159
+step 02600 | total 5.8393 | L_con 3.0490 | L_con_m 2.9196 | L_map 0.0007 | L_sup 2.9163 | L_ortho 0.000000 | L_hard 2.210157 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.078 | cos(+) 0.315 | cos(-) 0.061 | ln(B) 4.159
+[val] step 2600 | val_acc=0.0469 | no-improve (8/50)
+step 02650 | total 6.0501 | L_con 2.9832 | L_con_m 3.0205 | L_map 0.0007 | L_sup 3.0261 | L_ortho 0.000000 | L_hard 2.369123 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.326 | cos(-) 0.091 | ln(B) 4.159
+step 02700 | total 6.2536 | L_con 3.0697 | L_con_m 3.1370 | L_map 0.0007 | L_sup 3.1132 | L_ortho 0.000000 | L_hard 2.278023 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.312 | cos(-) 0.112 | ln(B) 4.159
+step 02750 | total 5.2334 | L_con 2.7015 | L_con_m 2.7039 | L_map 0.0006 | L_sup 2.5264 | L_ortho 0.000000 | L_hard 2.190772 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.370 | cos(-) 0.102 | ln(B) 4.159
+step 02800 | total 5.8512 | L_con 3.0377 | L_con_m 2.9618 | L_map 0.0007 | L_sup 2.8861 | L_ortho 0.000000 | L_hard 2.373931 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.078 | cos(+) 0.353 | cos(-) 0.092 | ln(B) 4.159
+[val] step 2800 | val_acc=0.0469 | no-improve (9/50)
+step 02850 | total 5.6144 | L_con 2.9054 | L_con_m 2.7885 | L_map 0.0007 | L_sup 2.8226 | L_ortho 0.000000 | L_hard 2.004910 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.358 | cos(-) 0.066 | ln(B) 4.159
+step 02900 | total 5.6496 | L_con 2.9488 | L_con_m 2.8501 | L_map 0.0006 | L_sup 2.7962 | L_ortho 0.000000 | L_hard 2.086489 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.387 | cos(-) 0.155 | ln(B) 4.159
+step 02950 | total 6.5490 | L_con 3.2696 | L_con_m 3.2841 | L_map 0.0007 | L_sup 3.2615 | L_ortho 0.000000 | L_hard 2.535775 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.317 | cos(-) 0.112 | ln(B) 4.159
+step 03000 | total 5.4220 | L_con 2.8128 | L_con_m 2.7790 | L_map 0.0007 | L_sup 2.6398 | L_ortho 0.000000 | L_hard 1.962538 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.377 | cos(-) 0.112 | ln(B) 4.159
+[val] step 3000 | val_acc=0.0469 | no-improve (10/50)
+step 03050 | total 5.4990 | L_con 2.8404 | L_con_m 2.8193 | L_map 0.0007 | L_sup 2.6764 | L_ortho 0.000000 | L_hard 2.171753 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.376 | cos(-) 0.066 | ln(B) 4.159
+step 03100 | total 6.0996 | L_con 3.2845 | L_con_m 3.1785 | L_map 0.0007 | L_sup 2.9177 | L_ortho 0.000000 | L_hard 2.452941 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.338 | cos(-) 0.087 | ln(B) 4.159
+step 03150 | total 5.8525 | L_con 3.0625 | L_con_m 3.0313 | L_map 0.0007 | L_sup 2.8178 | L_ortho 0.000000 | L_hard 2.350156 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.355 | cos(-) 0.100 | ln(B) 4.159
+step 03200 | total 5.0579 | L_con 2.6229 | L_con_m 2.5925 | L_map 0.0006 | L_sup 2.4622 | L_ortho 0.000000 | L_hard 2.062219 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.386 | cos(-) 0.104 | ln(B) 4.159
+[val] step 3200 | val_acc=0.0312 | no-improve (11/50)
+step 03250 | total 6.6653 | L_con 3.5273 | L_con_m 3.4515 | L_map 0.0007 | L_sup 3.2104 | L_ortho 0.000000 | L_hard 2.540594 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.356 | cos(-) 0.177 | ln(B) 4.159
+step 03300 | total 5.7314 | L_con 3.0248 | L_con_m 2.9177 | L_map 0.0007 | L_sup 2.8104 | L_ortho 0.000000 | L_hard 2.245342 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.375 | cos(-) 0.126 | ln(B) 4.159
+step 03350 | total 5.9028 | L_con 3.0870 | L_con_m 3.0237 | L_map 0.0007 | L_sup 2.8757 | L_ortho 0.000000 | L_hard 2.340356 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.338 | cos(-) 0.095 | ln(B) 4.159
+step 03400 | total 5.3993 | L_con 2.7025 | L_con_m 2.7598 | L_map 0.0006 | L_sup 2.6363 | L_ortho 0.000000 | L_hard 2.070261 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.383 | cos(-) 0.111 | ln(B) 4.159
+[val] step 3400 | val_acc=0.0312 | no-improve (12/50)
+step 03450 | total 6.3124 | L_con 3.2768 | L_con_m 3.2556 | L_map 0.0007 | L_sup 3.0533 | L_ortho 0.000000 | L_hard 2.539670 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.377 | cos(-) 0.175 | ln(B) 4.159
+step 03500 | total 5.7898 | L_con 2.9756 | L_con_m 2.9579 | L_map 0.0007 | L_sup 2.8285 | L_ortho 0.000000 | L_hard 2.219530 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.357 | cos(-) 0.095 | ln(B) 4.159
+step 03550 | total 6.5467 | L_con 3.3458 | L_con_m 3.3136 | L_map 0.0007 | L_sup 3.2296 | L_ortho 0.000000 | L_hard 2.414674 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.307 | cos(-) 0.101 | ln(B) 4.159
+step 03600 | total 6.3092 | L_con 3.2460 | L_con_m 3.2163 | L_map 0.0007 | L_sup 3.0896 | L_ortho 0.000000 | L_hard 2.431271 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.354 | cos(-) 0.125 | ln(B) 4.159
+[val] step 3600 | val_acc=0.0312 | no-improve (13/50)
+step 03650 | total 5.0629 | L_con 2.5415 | L_con_m 2.5721 | L_map 0.0006 | L_sup 2.4877 | L_ortho 0.000000 | L_hard 2.147074 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.414 | cos(-) 0.102 | ln(B) 4.159
+step 03700 | total 6.0500 | L_con 3.0396 | L_con_m 3.0524 | L_map 0.0007 | L_sup 2.9943 | L_ortho 0.000000 | L_hard 2.204046 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.369 | cos(-) 0.138 | ln(B) 4.159
+step 03750 | total 5.4659 | L_con 2.9162 | L_con_m 2.7968 | L_map 0.0006 | L_sup 2.6659 | L_ortho 0.000000 | L_hard 2.139233 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.378 | cos(-) 0.128 | ln(B) 4.159
+step 03800 | total 5.9934 | L_con 3.0780 | L_con_m 3.0666 | L_map 0.0007 | L_sup 2.9234 | L_ortho 0.000000 | L_hard 2.313655 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.370 | cos(-) 0.154 | ln(B) 4.159
+[val] step 3800 | val_acc=0.0469 | no-improve (14/50)
+step 03850 | total 5.2691 | L_con 2.6697 | L_con_m 2.6914 | L_map 0.0006 | L_sup 2.5745 | L_ortho 0.000000 | L_hard 2.275941 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.401 | cos(-) 0.117 | ln(B) 4.159
+step 03900 | total 5.9246 | L_con 2.9734 | L_con_m 2.9832 | L_map 0.0007 | L_sup 2.9381 | L_ortho 0.000000 | L_hard 2.284576 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.380 | cos(-) 0.132 | ln(B) 4.159
+step 03950 | total 6.3975 | L_con 3.3330 | L_con_m 3.3104 | L_map 0.0007 | L_sup 3.0837 | L_ortho 0.000000 | L_hard 2.339194 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.372 | cos(-) 0.173 | ln(B) 4.159
+step 04000 | total 6.0669 | L_con 3.0853 | L_con_m 3.0833 | L_map 0.0007 | L_sup 2.9803 | L_ortho 0.000000 | L_hard 2.429463 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.401 | cos(-) 0.173 | ln(B) 4.159
+[val] step 4000 | val_acc=0.0469 | no-improve (15/50)
+step 04050 | total 5.4630 | L_con 2.9027 | L_con_m 2.7901 | L_map 0.0007 | L_sup 2.6697 | L_ortho 0.000000 | L_hard 2.142954 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.348 | cos(-) 0.068 | ln(B) 4.159
+step 04100 | total 5.2844 | L_con 2.6415 | L_con_m 2.7100 | L_map 0.0006 | L_sup 2.5712 | L_ortho 0.000000 | L_hard 2.067358 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.399 | cos(-) 0.128 | ln(B) 4.159
+step 04150 | total 6.0878 | L_con 3.2560 | L_con_m 3.0804 | L_map 0.0007 | L_sup 3.0041 | L_ortho 0.000000 | L_hard 2.489331 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.078 | cos(+) 0.401 | cos(-) 0.159 | ln(B) 4.159
+step 04200 | total 6.3781 | L_con 3.4477 | L_con_m 3.2426 | L_map 0.0007 | L_sup 3.1321 | L_ortho 0.000000 | L_hard 2.397833 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.347 | cos(-) 0.139 | ln(B) 4.159
+[val] step 4200 | val_acc=0.0469 | no-improve (16/50)
+step 04250 | total 5.3418 | L_con 2.7627 | L_con_m 2.6820 | L_map 0.0006 | L_sup 2.6567 | L_ortho 0.000000 | L_hard 2.148463 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.408 | cos(-) 0.123 | ln(B) 4.159
+step 04300 | total 5.9639 | L_con 3.1936 | L_con_m 3.0160 | L_map 0.0007 | L_sup 2.9445 | L_ortho 0.000000 | L_hard 2.339176 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.078 | cos(+) 0.341 | cos(-) 0.108 | ln(B) 4.159
+step 04350 | total 5.2641 | L_con 2.7543 | L_con_m 2.6975 | L_map 0.0006 | L_sup 2.5634 | L_ortho 0.000000 | L_hard 2.187293 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.383 | cos(-) 0.114 | ln(B) 4.159
+step 04400 | total 6.0399 | L_con 3.1931 | L_con_m 3.0391 | L_map 0.0007 | L_sup 2.9976 | L_ortho 0.000000 | L_hard 2.554313 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.373 | cos(-) 0.114 | ln(B) 4.159
+[val] step 4400 | val_acc=0.0469 | no-improve (17/50)
+step 04450 | total 6.0559 | L_con 3.1032 | L_con_m 3.1356 | L_map 0.0006 | L_sup 2.9172 | L_ortho 0.000000 | L_hard 2.460635 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.451 | cos(-) 0.202 | ln(B) 4.159
+step 04500 | total 6.1900 | L_con 3.1199 | L_con_m 3.1844 | L_map 0.0007 | L_sup 3.0023 | L_ortho 0.000000 | L_hard 2.530855 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.373 | cos(-) 0.155 | ln(B) 4.159
+step 04550 | total 6.3478 | L_con 3.2041 | L_con_m 3.2644 | L_map 0.0007 | L_sup 3.0799 | L_ortho 0.000000 | L_hard 2.483153 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.322 | cos(-) 0.114 | ln(B) 4.159
+step 04600 | total 5.3200 | L_con 2.8127 | L_con_m 2.6722 | L_map 0.0006 | L_sup 2.6447 | L_ortho 0.000000 | L_hard 1.997133 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.234 | cos(+) 0.435 | cos(-) 0.146 | ln(B) 4.159
+[val] step 4600 | val_acc=0.0625 | no-improve (18/50)
+step 04650 | total 5.4611 | L_con 2.7541 | L_con_m 2.7500 | L_map 0.0006 | L_sup 2.7080 | L_ortho 0.000000 | L_hard 2.230226 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.387 | cos(-) 0.124 | ln(B) 4.159
+step 04700 | total 5.7033 | L_con 3.0180 | L_con_m 2.9094 | L_map 0.0006 | L_sup 2.7907 | L_ortho 0.000000 | L_hard 2.253197 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.406 | cos(-) 0.168 | ln(B) 4.159
+step 04750 | total 5.4726 | L_con 2.8683 | L_con_m 2.8357 | L_map 0.0006 | L_sup 2.6337 | L_ortho 0.000000 | L_hard 2.079846 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.423 | cos(-) 0.140 | ln(B) 4.159
+step 04800 | total 5.8767 | L_con 3.0556 | L_con_m 3.0851 | L_map 0.0007 | L_sup 2.7882 | L_ortho 0.000000 | L_hard 2.454140 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.345 | cos(-) 0.092 | ln(B) 4.159
+[val] step 4800 | val_acc=0.0469 | no-improve (19/50)
+step 04850 | total 6.1280 | L_con 3.1864 | L_con_m 3.1574 | L_map 0.0007 | L_sup 2.9672 | L_ortho 0.000000 | L_hard 2.175973 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.062 | cos(+) 0.370 | cos(-) 0.138 | ln(B) 4.159
+step 04900 | total 5.3696 | L_con 2.8016 | L_con_m 2.7419 | L_map 0.0006 | L_sup 2.6246 | L_ortho 0.000000 | L_hard 2.167150 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.419 | cos(-) 0.118 | ln(B) 4.159
+step 04950 | total 5.6956 | L_con 2.9678 | L_con_m 2.9378 | L_map 0.0007 | L_sup 2.7546 | L_ortho 0.000000 | L_hard 2.309172 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.380 | cos(-) 0.121 | ln(B) 4.159
+step 05000 | total 5.1702 | L_con 2.7681 | L_con_m 2.6180 | L_map 0.0006 | L_sup 2.5491 | L_ortho 0.000000 | L_hard 1.944971 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.397 | cos(-) 0.088 | ln(B) 4.159
+[val] step 5000 | val_acc=0.0625 | no-improve (20/50)
+step 05050 | total 5.2265 | L_con 2.6831 | L_con_m 2.6828 | L_map 0.0006 | L_sup 2.5406 | L_ortho 0.000000 | L_hard 2.031804 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.438 | cos(-) 0.152 | ln(B) 4.159
+step 05100 | total 5.8700 | L_con 2.9844 | L_con_m 2.9538 | L_map 0.0007 | L_sup 2.9129 | L_ortho 0.000000 | L_hard 2.290085 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.400 | cos(-) 0.165 | ln(B) 4.159
+step 05150 | total 5.4516 | L_con 2.7284 | L_con_m 2.7562 | L_map 0.0006 | L_sup 2.6922 | L_ortho 0.000000 | L_hard 2.113865 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.408 | cos(-) 0.126 | ln(B) 4.159
+step 05200 | total 5.7959 | L_con 3.0849 | L_con_m 2.8832 | L_map 0.0006 | L_sup 2.9095 | L_ortho 0.000000 | L_hard 2.173221 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.395 | cos(-) 0.160 | ln(B) 4.159
+[val] step 5200 | val_acc=0.0312 | no-improve (21/50)
+step 05250 | total 6.6639 | L_con 3.5679 | L_con_m 3.4179 | L_map 0.0006 | L_sup 3.2428 | L_ortho 0.000000 | L_hard 2.603328 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.408 | cos(-) 0.205 | ln(B) 4.159
+step 05300 | total 5.0879 | L_con 2.5891 | L_con_m 2.6194 | L_map 0.0006 | L_sup 2.4654 | L_ortho 0.000000 | L_hard 2.041852 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.413 | cos(-) 0.067 | ln(B) 4.159
+step 05350 | total 5.3766 | L_con 2.8551 | L_con_m 2.7751 | L_map 0.0006 | L_sup 2.5984 | L_ortho 0.000000 | L_hard 2.132730 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.443 | cos(-) 0.191 | ln(B) 4.159
+step 05400 | total 5.8236 | L_con 3.0428 | L_con_m 2.9681 | L_map 0.0007 | L_sup 2.8521 | L_ortho 0.000000 | L_hard 2.197632 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.346 | cos(-) 0.112 | ln(B) 4.159
+[val] step 5400 | val_acc=0.0469 | no-improve (22/50)
+step 05450 | total 5.4616 | L_con 2.8188 | L_con_m 2.8439 | L_map 0.0007 | L_sup 2.6144 | L_ortho 0.000000 | L_hard 2.199422 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.389 | cos(-) 0.135 | ln(B) 4.159
+step 05500 | total 5.8988 | L_con 3.0800 | L_con_m 3.0149 | L_map 0.0007 | L_sup 2.8806 | L_ortho 0.000000 | L_hard 2.327086 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.361 | cos(-) 0.113 | ln(B) 4.159
+step 05550 | total 6.0008 | L_con 3.1421 | L_con_m 3.0710 | L_map 0.0006 | L_sup 2.9265 | L_ortho 0.000000 | L_hard 2.339864 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.373 | cos(-) 0.162 | ln(B) 4.159
+step 05600 | total 5.9066 | L_con 3.2085 | L_con_m 2.9811 | L_map 0.0007 | L_sup 2.9221 | L_ortho 0.000000 | L_hard 2.172517 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.362 | cos(-) 0.105 | ln(B) 4.159
+[val] step 5600 | val_acc=0.0625 | no-improve (23/50)
+step 05650 | total 4.6163 | L_con 2.2883 | L_con_m 2.3496 | L_map 0.0006 | L_sup 2.2636 | L_ortho 0.000000 | L_hard 1.945368 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.250 | cos(+) 0.419 | cos(-) 0.085 | ln(B) 4.159
+step 05700 | total 5.9953 | L_con 3.1768 | L_con_m 3.0281 | L_map 0.0007 | L_sup 2.9639 | L_ortho 0.000000 | L_hard 2.313364 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.377 | cos(-) 0.108 | ln(B) 4.159
+step 05750 | total 5.7671 | L_con 3.0264 | L_con_m 2.9504 | L_map 0.0006 | L_sup 2.8136 | L_ortho 0.000000 | L_hard 2.192401 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.380 | cos(-) 0.118 | ln(B) 4.159
+step 05800 | total 5.7552 | L_con 3.0355 | L_con_m 2.9442 | L_map 0.0006 | L_sup 2.8078 | L_ortho 0.000000 | L_hard 2.347821 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.398 | cos(-) 0.146 | ln(B) 4.159
+[val] step 5800 | val_acc=0.0625 | no-improve (24/50)
+step 05850 | total 5.6538 | L_con 2.9146 | L_con_m 2.9386 | L_map 0.0007 | L_sup 2.7119 | L_ortho 0.000000 | L_hard 2.395234 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.387 | cos(-) 0.108 | ln(B) 4.159
+step 05900 | total 5.0177 | L_con 2.5756 | L_con_m 2.5781 | L_map 0.0007 | L_sup 2.4364 | L_ortho 0.000000 | L_hard 2.020672 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.384 | cos(-) 0.060 | ln(B) 4.159
+step 05950 | total 5.3542 | L_con 2.8552 | L_con_m 2.7308 | L_map 0.0006 | L_sup 2.6202 | L_ortho 0.000000 | L_hard 2.037150 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.378 | cos(-) 0.124 | ln(B) 4.159
+step 06000 | total 5.6780 | L_con 3.0188 | L_con_m 2.9006 | L_map 0.0006 | L_sup 2.7741 | L_ortho 0.000000 | L_hard 2.291603 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.379 | cos(-) 0.150 | ln(B) 4.159
+[val] step 6000 | val_acc=0.0625 | no-improve (25/50)
+step 06050 | total 4.8015 | L_con 2.4548 | L_con_m 2.4437 | L_map 0.0006 | L_sup 2.3547 | L_ortho 0.000000 | L_hard 1.886494 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.419 | cos(-) 0.079 | ln(B) 4.159
+step 06100 | total 5.4903 | L_con 2.8177 | L_con_m 2.7857 | L_map 0.0007 | L_sup 2.7014 | L_ortho 0.000000 | L_hard 2.176266 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.389 | cos(-) 0.112 | ln(B) 4.159
+step 06150 | total 5.5041 | L_con 2.8505 | L_con_m 2.7976 | L_map 0.0006 | L_sup 2.7033 | L_ortho 0.000000 | L_hard 2.360044 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.408 | cos(-) 0.111 | ln(B) 4.159
+step 06200 | total 5.5323 | L_con 2.8325 | L_con_m 2.7500 | L_map 0.0006 | L_sup 2.7791 | L_ortho 0.000000 | L_hard 2.108275 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.250 | cos(+) 0.408 | cos(-) 0.146 | ln(B) 4.159
+[val] step 6200 | val_acc=0.0469 | no-improve (26/50)
+step 06250 | total 5.2767 | L_con 2.7759 | L_con_m 2.7180 | L_map 0.0006 | L_sup 2.5556 | L_ortho 0.000000 | L_hard 1.980247 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.391 | cos(-) 0.070 | ln(B) 4.159
+step 06300 | total 5.2006 | L_con 2.6645 | L_con_m 2.6924 | L_map 0.0006 | L_sup 2.5050 | L_ortho 0.000000 | L_hard 2.050591 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.411 | cos(-) 0.115 | ln(B) 4.159
+step 06350 | total 5.4934 | L_con 2.9252 | L_con_m 2.7825 | L_map 0.0006 | L_sup 2.7077 | L_ortho 0.000000 | L_hard 2.039515 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.368 | cos(-) 0.088 | ln(B) 4.159
+step 06400 | total 5.8559 | L_con 3.1629 | L_con_m 2.9900 | L_map 0.0006 | L_sup 2.8627 | L_ortho 0.000000 | L_hard 2.350122 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.387 | cos(-) 0.146 | ln(B) 4.159
+[val] step 6400 | val_acc=0.0469 | no-improve (27/50)
+step 06450 | total 4.7683 | L_con 2.5003 | L_con_m 2.4302 | L_map 0.0006 | L_sup 2.3349 | L_ortho 0.000000 | L_hard 1.943862 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.417 | cos(-) 0.107 | ln(B) 4.159
+step 06500 | total 5.8799 | L_con 3.0371 | L_con_m 3.0277 | L_map 0.0007 | L_sup 2.8488 | L_ortho 0.000000 | L_hard 2.318563 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.062 | cos(+) 0.353 | cos(-) 0.113 | ln(B) 4.159
+step 06550 | total 5.1098 | L_con 2.7691 | L_con_m 2.5399 | L_map 0.0006 | L_sup 2.5667 | L_ortho 0.000000 | L_hard 2.040631 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.409 | cos(-) 0.079 | ln(B) 4.159
+step 06600 | total 5.0207 | L_con 2.5790 | L_con_m 2.5258 | L_map 0.0006 | L_sup 2.4917 | L_ortho 0.000000 | L_hard 2.093743 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.428 | cos(-) 0.113 | ln(B) 4.159
+[val] step 6600 | val_acc=0.0469 | no-improve (28/50)
+step 06650 | total 5.2380 | L_con 2.7604 | L_con_m 2.7083 | L_map 0.0006 | L_sup 2.5265 | L_ortho 0.000000 | L_hard 2.165555 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.416 | cos(-) 0.143 | ln(B) 4.159
+step 06700 | total 5.7911 | L_con 3.1010 | L_con_m 2.9948 | L_map 0.0007 | L_sup 2.7930 | L_ortho 0.000000 | L_hard 2.441821 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.383 | cos(-) 0.140 | ln(B) 4.159
+step 06750 | total 4.8895 | L_con 2.4849 | L_con_m 2.5006 | L_map 0.0006 | L_sup 2.3857 | L_ortho 0.000000 | L_hard 1.930048 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.424 | cos(-) 0.085 | ln(B) 4.159
+step 06800 | total 4.9439 | L_con 2.6517 | L_con_m 2.5456 | L_map 0.0006 | L_sup 2.3951 | L_ortho 0.000000 | L_hard 2.001477 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.408 | cos(-) 0.108 | ln(B) 4.159
+[val] step 6800 | val_acc=0.0312 | no-improve (29/50)
+step 06850 | total 5.2131 | L_con 2.6771 | L_con_m 2.6920 | L_map 0.0006 | L_sup 2.5179 | L_ortho 0.000000 | L_hard 2.133957 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.219 | cos(+) 0.398 | cos(-) 0.076 | ln(B) 4.159
+step 06900 | total 5.0275 | L_con 2.6063 | L_con_m 2.6344 | L_map 0.0006 | L_sup 2.3899 | L_ortho 0.000000 | L_hard 1.957840 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.388 | cos(-) 0.093 | ln(B) 4.159
+step 06950 | total 5.5298 | L_con 2.8507 | L_con_m 2.8481 | L_map 0.0007 | L_sup 2.6784 | L_ortho 0.000000 | L_hard 2.164036 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.387 | cos(-) 0.130 | ln(B) 4.159
+step 07000 | total 5.5046 | L_con 2.7384 | L_con_m 2.8114 | L_map 0.0007 | L_sup 2.6899 | L_ortho 0.000000 | L_hard 2.097426 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.419 | cos(-) 0.174 | ln(B) 4.159
+[val] step 7000 | val_acc=0.0469 | no-improve (30/50)
+step 07050 | total 5.9785 | L_con 3.0904 | L_con_m 3.0776 | L_map 0.0007 | L_sup 2.8975 | L_ortho 0.000000 | L_hard 2.326068 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.364 | cos(-) 0.148 | ln(B) 4.159
+step 07100 | total 5.4258 | L_con 2.7429 | L_con_m 2.7770 | L_map 0.0006 | L_sup 2.6455 | L_ortho 0.000000 | L_hard 2.249399 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.387 | cos(-) 0.113 | ln(B) 4.159
+step 07150 | total 5.7524 | L_con 3.0121 | L_con_m 2.8884 | L_map 0.0007 | L_sup 2.8608 | L_ortho 0.000000 | L_hard 2.256254 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.382 | cos(-) 0.053 | ln(B) 4.159
+step 07200 | total 4.4111 | L_con 2.2859 | L_con_m 2.2228 | L_map 0.0006 | L_sup 2.1853 | L_ortho 0.000000 | L_hard 1.825046 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.234 | cos(+) 0.433 | cos(-) 0.055 | ln(B) 4.159
+[val] step 7200 | val_acc=0.0625 | no-improve (31/50)
+step 07250 | total 5.5228 | L_con 2.8255 | L_con_m 2.7500 | L_map 0.0007 | L_sup 2.7695 | L_ortho 0.000000 | L_hard 2.217774 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.350 | cos(-) 0.087 | ln(B) 4.159
+step 07300 | total 5.0204 | L_con 2.5557 | L_con_m 2.4919 | L_map 0.0007 | L_sup 2.5252 | L_ortho 0.000000 | L_hard 1.959321 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.219 | cos(+) 0.372 | cos(-) 0.069 | ln(B) 4.159
+step 07350 | total 4.9444 | L_con 2.4596 | L_con_m 2.5425 | L_map 0.0006 | L_sup 2.3986 | L_ortho 0.000000 | L_hard 1.974329 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.426 | cos(-) 0.130 | ln(B) 4.159
+step 07400 | total 5.6747 | L_con 2.8882 | L_con_m 2.8896 | L_map 0.0007 | L_sup 2.7818 | L_ortho 0.000000 | L_hard 2.192406 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.396 | cos(-) 0.119 | ln(B) 4.159
+[val] step 7400 | val_acc=0.0625 | no-improve (32/50)
+step 07450 | total 4.8838 | L_con 2.4622 | L_con_m 2.5073 | L_map 0.0006 | L_sup 2.3734 | L_ortho 0.000000 | L_hard 2.025239 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.219 | cos(+) 0.420 | cos(-) 0.098 | ln(B) 4.159
+step 07500 | total 4.9086 | L_con 2.4515 | L_con_m 2.4763 | L_map 0.0006 | L_sup 2.4290 | L_ortho 0.000000 | L_hard 1.922599 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.415 | cos(-) 0.073 | ln(B) 4.159
+step 07550 | total 6.0191 | L_con 3.2322 | L_con_m 3.0144 | L_map 0.0007 | L_sup 3.0014 | L_ortho 0.000000 | L_hard 2.215251 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.360 | cos(-) 0.132 | ln(B) 4.159
+step 07600 | total 5.6109 | L_con 3.0166 | L_con_m 2.8488 | L_map 0.0007 | L_sup 2.7588 | L_ortho 0.000000 | L_hard 2.214481 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.381 | cos(-) 0.098 | ln(B) 4.159
+[val] step 7600 | val_acc=0.0625 | no-improve (33/50)
+step 07650 | total 5.3241 | L_con 2.7561 | L_con_m 2.6907 | L_map 0.0006 | L_sup 2.6302 | L_ortho 0.000000 | L_hard 2.191671 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.392 | cos(-) 0.082 | ln(B) 4.159
+step 07700 | total 5.2407 | L_con 2.7163 | L_con_m 2.6907 | L_map 0.0006 | L_sup 2.5468 | L_ortho 0.000000 | L_hard 2.159720 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.411 | cos(-) 0.120 | ln(B) 4.159
+step 07750 | total 4.8815 | L_con 2.5044 | L_con_m 2.4821 | L_map 0.0006 | L_sup 2.3963 | L_ortho 0.000000 | L_hard 2.008151 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.404 | cos(-) 0.073 | ln(B) 4.159
+step 07800 | total 5.6076 | L_con 2.9229 | L_con_m 2.8015 | L_map 0.0006 | L_sup 2.8029 | L_ortho 0.000000 | L_hard 2.142675 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.373 | cos(-) 0.128 | ln(B) 4.159
+[val] step 7800 | val_acc=0.0312 | no-improve (34/50)
+step 07850 | total 5.3727 | L_con 2.8296 | L_con_m 2.7583 | L_map 0.0006 | L_sup 2.6112 | L_ortho 0.000000 | L_hard 2.069908 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.381 | cos(-) 0.094 | ln(B) 4.159
+step 07900 | total 4.9514 | L_con 2.6930 | L_con_m 2.5235 | L_map 0.0006 | L_sup 2.4248 | L_ortho 0.000000 | L_hard 1.998025 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.384 | cos(-) 0.052 | ln(B) 4.159
+step 07950 | total 6.0124 | L_con 3.3184 | L_con_m 3.0562 | L_map 0.0007 | L_sup 2.9529 | L_ortho 0.000000 | L_hard 2.229079 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.361 | cos(-) 0.102 | ln(B) 4.159
+step 08000 | total 5.4244 | L_con 2.7921 | L_con_m 2.7209 | L_map 0.0006 | L_sup 2.7003 | L_ortho 0.000000 | L_hard 2.079151 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.403 | cos(-) 0.109 | ln(B) 4.159
+[val] step 8000 | val_acc=0.0781 | IMPROVED
+step 08050 | total 4.9085 | L_con 2.5334 | L_con_m 2.4910 | L_map 0.0006 | L_sup 2.4144 | L_ortho 0.000000 | L_hard 2.048037 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.420 | cos(-) 0.107 | ln(B) 4.159
+step 08100 | total 5.4000 | L_con 2.8351 | L_con_m 2.7070 | L_map 0.0006 | L_sup 2.6899 | L_ortho 0.000000 | L_hard 2.060625 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.422 | cos(-) 0.122 | ln(B) 4.159
+step 08150 | total 4.6885 | L_con 2.3855 | L_con_m 2.3770 | L_map 0.0006 | L_sup 2.3084 | L_ortho 0.000000 | L_hard 1.944916 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.234 | cos(+) 0.429 | cos(-) 0.099 | ln(B) 4.159
+step 08200 | total 5.4611 | L_con 2.7812 | L_con_m 2.7343 | L_map 0.0006 | L_sup 2.7236 | L_ortho 0.000000 | L_hard 2.093008 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.401 | cos(-) 0.089 | ln(B) 4.159
+[val] step 8200 | val_acc=0.0625 | no-improve (1/50)
+step 08250 | total 4.6377 | L_con 2.3268 | L_con_m 2.3524 | L_map 0.0006 | L_sup 2.2821 | L_ortho 0.000000 | L_hard 1.890855 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.434 | cos(-) 0.079 | ln(B) 4.159
+step 08300 | total 4.6673 | L_con 2.4711 | L_con_m 2.3836 | L_map 0.0006 | L_sup 2.2806 | L_ortho 0.000000 | L_hard 1.978949 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.436 | cos(-) 0.097 | ln(B) 4.159
+step 08350 | total 4.9420 | L_con 2.5247 | L_con_m 2.5373 | L_map 0.0006 | L_sup 2.4014 | L_ortho 0.000000 | L_hard 1.913822 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.410 | cos(-) 0.122 | ln(B) 4.159
+step 08400 | total 4.9436 | L_con 2.6230 | L_con_m 2.5037 | L_map 0.0006 | L_sup 2.4367 | L_ortho 0.000000 | L_hard 1.960203 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.393 | cos(-) 0.062 | ln(B) 4.159
+[val] step 8400 | val_acc=0.0625 | no-improve (2/50)
+step 08450 | total 5.2738 | L_con 2.8656 | L_con_m 2.7109 | L_map 0.0007 | L_sup 2.5596 | L_ortho 0.000000 | L_hard 2.155759 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.361 | cos(-) 0.070 | ln(B) 4.159
+step 08500 | total 5.0817 | L_con 2.5145 | L_con_m 2.6513 | L_map 0.0006 | L_sup 2.4273 | L_ortho 0.000000 | L_hard 2.114552 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.434 | cos(-) 0.128 | ln(B) 4.159
+step 08550 | total 5.8458 | L_con 3.0679 | L_con_m 2.9729 | L_map 0.0006 | L_sup 2.8698 | L_ortho 0.000000 | L_hard 2.166111 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.405 | cos(-) 0.164 | ln(B) 4.159
+step 08600 | total 5.5212 | L_con 2.8555 | L_con_m 2.8343 | L_map 0.0006 | L_sup 2.6837 | L_ortho 0.000000 | L_hard 2.257170 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.415 | cos(-) 0.124 | ln(B) 4.159
+[val] step 8600 | val_acc=0.0625 | no-improve (3/50)
+step 08650 | total 5.0488 | L_con 2.6829 | L_con_m 2.5695 | L_map 0.0007 | L_sup 2.4760 | L_ortho 0.000000 | L_hard 2.113847 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.365 | cos(-) 0.044 | ln(B) 4.159
+step 08700 | total 4.8311 | L_con 2.5905 | L_con_m 2.4408 | L_map 0.0006 | L_sup 2.3871 | L_ortho 0.000000 | L_hard 2.062984 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.419 | cos(-) 0.083 | ln(B) 4.159
+step 08750 | total 4.7598 | L_con 2.4334 | L_con_m 2.4929 | L_map 0.0006 | L_sup 2.2636 | L_ortho 0.000000 | L_hard 2.020638 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.412 | cos(-) 0.064 | ln(B) 4.159
+step 08800 | total 4.9861 | L_con 2.7157 | L_con_m 2.5280 | L_map 0.0006 | L_sup 2.4549 | L_ortho 0.000000 | L_hard 2.143816 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.418 | cos(-) 0.089 | ln(B) 4.159
+[val] step 8800 | val_acc=0.0469 | no-improve (4/50)
+step 08850 | total 5.9858 | L_con 3.2016 | L_con_m 3.0420 | L_map 0.0007 | L_sup 2.9404 | L_ortho 0.000000 | L_hard 2.274651 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.357 | cos(-) 0.118 | ln(B) 4.159
+step 08900 | total 5.4222 | L_con 2.8374 | L_con_m 2.7426 | L_map 0.0007 | L_sup 2.6763 | L_ortho 0.000000 | L_hard 2.092807 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.371 | cos(-) 0.097 | ln(B) 4.159
+step 08950 | total 5.0370 | L_con 2.5775 | L_con_m 2.5501 | L_map 0.0006 | L_sup 2.4837 | L_ortho 0.000000 | L_hard 2.042252 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.234 | cos(+) 0.428 | cos(-) 0.124 | ln(B) 4.159
+step 09000 | total 4.9719 | L_con 2.5362 | L_con_m 2.4918 | L_map 0.0006 | L_sup 2.4770 | L_ortho 0.000000 | L_hard 1.883777 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.401 | cos(-) 0.098 | ln(B) 4.159
+[val] step 9000 | val_acc=0.0312 | no-improve (5/50)
+step 09050 | total 5.8827 | L_con 2.9820 | L_con_m 3.0196 | L_map 0.0007 | L_sup 2.8598 | L_ortho 0.000000 | L_hard 2.234936 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.405 | cos(-) 0.199 | ln(B) 4.159
+step 09100 | total 5.7586 | L_con 3.0137 | L_con_m 2.9197 | L_map 0.0007 | L_sup 2.8357 | L_ortho 0.000000 | L_hard 2.295166 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.395 | cos(-) 0.094 | ln(B) 4.159
+step 09150 | total 4.9342 | L_con 2.5970 | L_con_m 2.5183 | L_map 0.0006 | L_sup 2.4127 | L_ortho 0.000000 | L_hard 2.009090 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.416 | cos(-) 0.082 | ln(B) 4.159
+step 09200 | total 5.0518 | L_con 2.5087 | L_con_m 2.5797 | L_map 0.0006 | L_sup 2.4689 | L_ortho 0.000000 | L_hard 1.947356 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.219 | cos(+) 0.395 | cos(-) 0.063 | ln(B) 4.159
+[val] step 9200 | val_acc=0.0469 | no-improve (6/50)
+step 09250 | total 5.5380 | L_con 2.8574 | L_con_m 2.7846 | L_map 0.0007 | L_sup 2.7501 | L_ortho 0.000000 | L_hard 2.053151 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.371 | cos(-) 0.081 | ln(B) 4.159
+step 09300 | total 5.7503 | L_con 3.1147 | L_con_m 2.9161 | L_map 0.0007 | L_sup 2.8310 | L_ortho 0.000000 | L_hard 2.240515 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.380 | cos(-) 0.131 | ln(B) 4.159
+step 09350 | total 4.9152 | L_con 2.4703 | L_con_m 2.5200 | L_map 0.0006 | L_sup 2.3921 | L_ortho 0.000000 | L_hard 2.032035 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.250 | cos(+) 0.418 | cos(-) 0.113 | ln(B) 4.159
+step 09400 | total 5.6732 | L_con 2.9952 | L_con_m 2.8165 | L_map 0.0006 | L_sup 2.8535 | L_ortho 0.000000 | L_hard 2.293054 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.387 | cos(-) 0.127 | ln(B) 4.159
+[val] step 9400 | val_acc=0.0312 | no-improve (7/50)
+step 09450 | total 5.4305 | L_con 2.8445 | L_con_m 2.7560 | L_map 0.0006 | L_sup 2.6713 | L_ortho 0.000000 | L_hard 2.167943 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.395 | cos(-) 0.131 | ln(B) 4.159
+step 09500 | total 4.8364 | L_con 2.5272 | L_con_m 2.4102 | L_map 0.0006 | L_sup 2.4231 | L_ortho 0.000000 | L_hard 1.898241 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.397 | cos(-) 0.072 | ln(B) 4.159
+step 09550 | total 4.9983 | L_con 2.5359 | L_con_m 2.4979 | L_map 0.0006 | L_sup 2.4972 | L_ortho 0.000000 | L_hard 2.071994 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.428 | cos(-) 0.088 | ln(B) 4.159
+step 09600 | total 5.2879 | L_con 2.8324 | L_con_m 2.7200 | L_map 0.0006 | L_sup 2.5646 | L_ortho 0.000000 | L_hard 2.227674 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.403 | cos(-) 0.103 | ln(B) 4.159
+[val] step 9600 | val_acc=0.0625 | no-improve (8/50)
+step 09650 | total 5.6292 | L_con 2.8843 | L_con_m 2.7933 | L_map 0.0006 | L_sup 2.8327 | L_ortho 0.000000 | L_hard 2.275018 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.422 | cos(-) 0.134 | ln(B) 4.159
+step 09700 | total 5.0143 | L_con 2.5717 | L_con_m 2.5094 | L_map 0.0007 | L_sup 2.5016 | L_ortho 0.000000 | L_hard 1.947309 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.234 | cos(+) 0.388 | cos(-) 0.090 | ln(B) 4.159
+step 09750 | total 4.8343 | L_con 2.5556 | L_con_m 2.5094 | L_map 0.0006 | L_sup 2.3218 | L_ortho 0.000000 | L_hard 1.961826 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.409 | cos(-) 0.073 | ln(B) 4.159
+step 09800 | total 5.9710 | L_con 3.0854 | L_con_m 3.0609 | L_map 0.0007 | L_sup 2.9068 | L_ortho 0.000000 | L_hard 2.221556 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.352 | cos(-) 0.050 | ln(B) 4.159
+[val] step 9800 | val_acc=0.0625 | no-improve (9/50)
+step 09850 | total 5.1323 | L_con 2.6476 | L_con_m 2.5703 | L_map 0.0006 | L_sup 2.5588 | L_ortho 0.000000 | L_hard 1.965737 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.396 | cos(-) 0.073 | ln(B) 4.159
+step 09900 | total 5.2104 | L_con 2.7141 | L_con_m 2.6316 | L_map 0.0007 | L_sup 2.5755 | L_ortho 0.000000 | L_hard 2.068984 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.219 | cos(+) 0.366 | cos(-) 0.107 | ln(B) 4.159
+step 09950 | total 4.9719 | L_con 2.6448 | L_con_m 2.5318 | L_map 0.0006 | L_sup 2.4368 | L_ortho 0.000000 | L_hard 2.057032 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.425 | cos(-) 0.104 | ln(B) 4.159
+step 10000 | total 5.8747 | L_con 3.0613 | L_con_m 3.0961 | L_map 0.0007 | L_sup 2.7752 | L_ortho 0.000000 | L_hard 2.262765 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.381 | cos(-) 0.178 | ln(B) 4.159
+[val] step 10000 | val_acc=0.0469 | no-improve (10/50)
+step 10050 | total 5.3863 | L_con 2.7837 | L_con_m 2.7412 | L_map 0.0007 | L_sup 2.6418 | L_ortho 0.000000 | L_hard 2.091113 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.386 | cos(-) 0.087 | ln(B) 4.159
+step 10100 | total 5.2147 | L_con 2.7288 | L_con_m 2.6393 | L_map 0.0007 | L_sup 2.5722 | L_ortho 0.000000 | L_hard 2.065472 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.386 | cos(-) 0.056 | ln(B) 4.159
+step 10150 | total 5.1490 | L_con 2.6904 | L_con_m 2.6457 | L_map 0.0007 | L_sup 2.5000 | L_ortho 0.000000 | L_hard 1.981729 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.385 | cos(-) 0.088 | ln(B) 4.159
+step 10200 | total 6.0498 | L_con 3.2958 | L_con_m 3.1359 | L_map 0.0007 | L_sup 2.9104 | L_ortho 0.000000 | L_hard 2.318280 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.335 | cos(-) 0.120 | ln(B) 4.159
+[val] step 10200 | val_acc=0.0469 | no-improve (11/50)
+step 10250 | total 6.1821 | L_con 3.3558 | L_con_m 3.1143 | L_map 0.0007 | L_sup 3.0644 | L_ortho 0.000000 | L_hard 2.303136 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.340 | cos(-) 0.087 | ln(B) 4.159
+step 10300 | total 4.5849 | L_con 2.3788 | L_con_m 2.3145 | L_map 0.0006 | L_sup 2.2673 | L_ortho 0.000000 | L_hard 1.848838 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.418 | cos(-) 0.109 | ln(B) 4.159
+step 10350 | total 5.0421 | L_con 2.7258 | L_con_m 2.5908 | L_map 0.0006 | L_sup 2.4482 | L_ortho 0.000000 | L_hard 2.045517 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.396 | cos(-) 0.084 | ln(B) 4.159
+step 10400 | total 5.2308 | L_con 2.7780 | L_con_m 2.7172 | L_map 0.0006 | L_sup 2.5103 | L_ortho 0.000000 | L_hard 2.049447 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.219 | cos(+) 0.419 | cos(-) 0.136 | ln(B) 4.159
+[val] step 10400 | val_acc=0.0312 | no-improve (12/50)
+step 10450 | total 4.9707 | L_con 2.6935 | L_con_m 2.5470 | L_map 0.0006 | L_sup 2.4204 | L_ortho 0.000000 | L_hard 2.122309 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.431 | cos(-) 0.095 | ln(B) 4.159
+step 10500 | total 5.1484 | L_con 2.6536 | L_con_m 2.6393 | L_map 0.0006 | L_sup 2.5059 | L_ortho 0.000000 | L_hard 2.070783 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.392 | cos(-) 0.067 | ln(B) 4.159
+step 10550 | total 5.6535 | L_con 2.8866 | L_con_m 2.8320 | L_map 0.0007 | L_sup 2.8182 | L_ortho 0.000000 | L_hard 2.078084 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.266 | cos(+) 0.384 | cos(-) 0.116 | ln(B) 4.159
+step 10600 | total 5.0684 | L_con 2.5771 | L_con_m 2.4982 | L_map 0.0007 | L_sup 2.5670 | L_ortho 0.000000 | L_hard 1.980086 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.219 | cos(+) 0.383 | cos(-) 0.091 | ln(B) 4.159
+[val] step 10600 | val_acc=0.0625 | no-improve (13/50)
+step 10650 | total 5.2091 | L_con 2.7282 | L_con_m 2.6359 | L_map 0.0006 | L_sup 2.5701 | L_ortho 0.000000 | L_hard 2.208325 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.422 | cos(-) 0.118 | ln(B) 4.159
+step 10700 | total 5.6393 | L_con 3.0132 | L_con_m 2.7803 | L_map 0.0006 | L_sup 2.8557 | L_ortho 0.000000 | L_hard 2.149807 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.389 | cos(-) 0.128 | ln(B) 4.159
+step 10750 | total 4.9594 | L_con 2.6171 | L_con_m 2.5560 | L_map 0.0006 | L_sup 2.4003 | L_ortho 0.000000 | L_hard 1.997998 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.392 | cos(-) 0.074 | ln(B) 4.159
+step 10800 | total 5.0874 | L_con 2.5811 | L_con_m 2.5186 | L_map 0.0006 | L_sup 2.5656 | L_ortho 0.000000 | L_hard 2.095187 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.410 | cos(-) 0.100 | ln(B) 4.159
+[val] step 10800 | val_acc=0.0312 | no-improve (14/50)
+step 10850 | total 5.4059 | L_con 2.8805 | L_con_m 2.7768 | L_map 0.0007 | L_sup 2.6257 | L_ortho 0.000000 | L_hard 2.222681 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.354 | cos(-) 0.064 | ln(B) 4.159
+step 10900 | total 4.8873 | L_con 2.4999 | L_con_m 2.4429 | L_map 0.0006 | L_sup 2.4413 | L_ortho 0.000000 | L_hard 2.068574 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.463 | cos(-) 0.119 | ln(B) 4.159
+step 10950 | total 4.8918 | L_con 2.5593 | L_con_m 2.4941 | L_map 0.0006 | L_sup 2.3945 | L_ortho 0.000000 | L_hard 1.995966 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.427 | cos(-) 0.110 | ln(B) 4.159
+step 11000 | total 5.9498 | L_con 3.2106 | L_con_m 2.9847 | L_map 0.0007 | L_sup 2.9618 | L_ortho 0.000000 | L_hard 2.423099 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.062 | cos(+) 0.359 | cos(-) 0.066 | ln(B) 4.159
+[val] step 11000 | val_acc=0.0312 | no-improve (15/50)
+step 11050 | total 5.4372 | L_con 3.0476 | L_con_m 2.7731 | L_map 0.0007 | L_sup 2.6608 | L_ortho 0.000000 | L_hard 2.153259 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.388 | cos(-) 0.068 | ln(B) 4.159
+step 11100 | total 5.0130 | L_con 2.6281 | L_con_m 2.5391 | L_map 0.0006 | L_sup 2.4707 | L_ortho 0.000000 | L_hard 2.154842 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.234 | cos(+) 0.405 | cos(-) 0.087 | ln(B) 4.159
+step 11150 | total 5.2830 | L_con 2.6698 | L_con_m 2.6538 | L_map 0.0006 | L_sup 2.6259 | L_ortho 0.000000 | L_hard 2.012425 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.389 | cos(-) 0.089 | ln(B) 4.159
+step 11200 | total 4.8743 | L_con 2.5567 | L_con_m 2.4699 | L_map 0.0006 | L_sup 2.4012 | L_ortho 0.000000 | L_hard 2.001076 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.411 | cos(-) 0.128 | ln(B) 4.159
+[val] step 11200 | val_acc=0.0469 | no-improve (16/50)
+step 11250 | total 4.9285 | L_con 2.5953 | L_con_m 2.5320 | L_map 0.0006 | L_sup 2.3933 | L_ortho 0.000000 | L_hard 2.041068 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.390 | cos(-) 0.057 | ln(B) 4.159
+step 11300 | total 5.1400 | L_con 2.8105 | L_con_m 2.6265 | L_map 0.0007 | L_sup 2.5102 | L_ortho 0.000000 | L_hard 2.137048 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.383 | cos(-) 0.089 | ln(B) 4.159
+step 11350 | total 5.2199 | L_con 2.6248 | L_con_m 2.6288 | L_map 0.0007 | L_sup 2.5879 | L_ortho 0.000000 | L_hard 2.048687 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.250 | cos(+) 0.411 | cos(-) 0.152 | ln(B) 4.159
+step 11400 | total 5.4897 | L_con 2.9659 | L_con_m 2.8340 | L_map 0.0007 | L_sup 2.6524 | L_ortho 0.000000 | L_hard 2.189840 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.393 | cos(-) 0.108 | ln(B) 4.159
+[val] step 11400 | val_acc=0.0469 | no-improve (17/50)
+step 11450 | total 5.1821 | L_con 2.7323 | L_con_m 2.6382 | L_map 0.0006 | L_sup 2.5407 | L_ortho 0.000000 | L_hard 2.067917 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.412 | cos(-) 0.062 | ln(B) 4.159
+step 11500 | total 5.7316 | L_con 2.9794 | L_con_m 2.9009 | L_map 0.0007 | L_sup 2.8273 | L_ortho 0.000000 | L_hard 2.160992 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.375 | cos(-) 0.120 | ln(B) 4.159
+step 11550 | total 5.1392 | L_con 2.7993 | L_con_m 2.5928 | L_map 0.0007 | L_sup 2.5432 | L_ortho 0.000000 | L_hard 2.093462 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.388 | cos(-) 0.092 | ln(B) 4.159
+step 11600 | total 5.5567 | L_con 3.0162 | L_con_m 2.8313 | L_map 0.0007 | L_sup 2.7221 | L_ortho 0.000000 | L_hard 2.261304 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.364 | cos(-) 0.110 | ln(B) 4.159
+[val] step 11600 | val_acc=0.0312 | no-improve (18/50)
+step 11650 | total 5.1556 | L_con 2.6564 | L_con_m 2.6774 | L_map 0.0007 | L_sup 2.4750 | L_ortho 0.000000 | L_hard 2.277400 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.386 | cos(-) 0.096 | ln(B) 4.159
+step 11700 | total 4.8599 | L_con 2.5049 | L_con_m 2.4005 | L_map 0.0006 | L_sup 2.4562 | L_ortho 0.000000 | L_hard 2.034592 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.409 | cos(-) 0.085 | ln(B) 4.159
+step 11750 | total 4.6710 | L_con 2.4602 | L_con_m 2.3814 | L_map 0.0006 | L_sup 2.2864 | L_ortho 0.000000 | L_hard 1.846756 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.405 | cos(-) 0.057 | ln(B) 4.159
+step 11800 | total 5.1552 | L_con 2.7837 | L_con_m 2.6221 | L_map 0.0006 | L_sup 2.5300 | L_ortho 0.000000 | L_hard 2.188942 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.406 | cos(-) 0.098 | ln(B) 4.159
+[val] step 11800 | val_acc=0.0312 | no-improve (19/50)
+step 11850 | total 5.2298 | L_con 2.7544 | L_con_m 2.6257 | L_map 0.0007 | L_sup 2.6008 | L_ortho 0.000000 | L_hard 2.036316 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.381 | cos(-) 0.097 | ln(B) 4.159
+step 11900 | total 5.5046 | L_con 2.7784 | L_con_m 2.8241 | L_map 0.0007 | L_sup 2.6773 | L_ortho 0.000000 | L_hard 2.156432 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.367 | cos(-) 0.088 | ln(B) 4.159
+step 11950 | total 5.2756 | L_con 2.7966 | L_con_m 2.6766 | L_map 0.0007 | L_sup 2.5957 | L_ortho 0.000000 | L_hard 2.142973 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.383 | cos(-) 0.096 | ln(B) 4.159
+step 12000 | total 4.8292 | L_con 2.5048 | L_con_m 2.4631 | L_map 0.0006 | L_sup 2.3630 | L_ortho 0.000000 | L_hard 2.044976 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.447 | cos(-) 0.099 | ln(B) 4.159
+[val] step 12000 | val_acc=0.0469 | no-improve (20/50)
+step 12050 | total 4.7826 | L_con 2.5216 | L_con_m 2.4165 | L_map 0.0006 | L_sup 2.3630 | L_ortho 0.000000 | L_hard 2.083501 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.420 | cos(-) 0.110 | ln(B) 4.159
+step 12100 | total 4.7915 | L_con 2.5785 | L_con_m 2.3913 | L_map 0.0006 | L_sup 2.3970 | L_ortho 0.000000 | L_hard 1.920006 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.387 | cos(-) 0.069 | ln(B) 4.159
+step 12150 | total 5.1227 | L_con 2.6882 | L_con_m 2.6043 | L_map 0.0006 | L_sup 2.5153 | L_ortho 0.000000 | L_hard 2.141668 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.426 | cos(-) 0.137 | ln(B) 4.159
+step 12200 | total 4.9126 | L_con 2.4995 | L_con_m 2.4746 | L_map 0.0007 | L_sup 2.4347 | L_ortho 0.000000 | L_hard 1.952004 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.219 | cos(+) 0.380 | cos(-) 0.073 | ln(B) 4.159
+[val] step 12200 | val_acc=0.0312 | no-improve (21/50)
+step 12250 | total 5.0640 | L_con 2.7409 | L_con_m 2.5909 | L_map 0.0006 | L_sup 2.4699 | L_ortho 0.000000 | L_hard 2.030283 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.402 | cos(-) 0.118 | ln(B) 4.159
+step 12300 | total 4.9605 | L_con 2.6088 | L_con_m 2.5168 | L_map 0.0006 | L_sup 2.4406 | L_ortho 0.000000 | L_hard 2.137475 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.424 | cos(-) 0.075 | ln(B) 4.159
+step 12350 | total 5.4745 | L_con 2.8859 | L_con_m 2.8474 | L_map 0.0007 | L_sup 2.6238 | L_ortho 0.000000 | L_hard 2.188998 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.365 | cos(-) 0.058 | ln(B) 4.159
+step 12400 | total 4.9272 | L_con 2.5179 | L_con_m 2.4581 | L_map 0.0006 | L_sup 2.4660 | L_ortho 0.000000 | L_hard 1.967410 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.409 | cos(-) 0.092 | ln(B) 4.159
+[val] step 12400 | val_acc=0.0312 | no-improve (22/50)
+step 12450 | total 5.0468 | L_con 2.6405 | L_con_m 2.5426 | L_map 0.0006 | L_sup 2.5011 | L_ortho 0.000000 | L_hard 2.175286 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.219 | cos(+) 0.424 | cos(-) 0.107 | ln(B) 4.159
+step 12500 | total 5.5477 | L_con 2.9389 | L_con_m 2.8875 | L_map 0.0006 | L_sup 2.6570 | L_ortho 0.000000 | L_hard 2.349465 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.409 | cos(-) 0.091 | ln(B) 4.159
+step 12550 | total 4.8966 | L_con 2.5293 | L_con_m 2.4902 | L_map 0.0006 | L_sup 2.4031 | L_ortho 0.000000 | L_hard 2.002559 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.062 | cos(+) 0.405 | cos(-) 0.071 | ln(B) 4.159
+step 12600 | total 5.2577 | L_con 2.7885 | L_con_m 2.6319 | L_map 0.0007 | L_sup 2.6226 | L_ortho 0.000000 | L_hard 2.001324 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.349 | cos(-) 0.090 | ln(B) 4.159
+[val] step 12600 | val_acc=0.0312 | no-improve (23/50)
+step 12650 | total 5.4114 | L_con 2.7606 | L_con_m 2.7585 | L_map 0.0007 | L_sup 2.6495 | L_ortho 0.000000 | L_hard 2.353113 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.369 | cos(-) 0.076 | ln(B) 4.159
+step 12700 | total 5.6244 | L_con 2.9310 | L_con_m 2.8238 | L_map 0.0007 | L_sup 2.7973 | L_ortho 0.000000 | L_hard 2.337440 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.370 | cos(-) 0.082 | ln(B) 4.159
+step 12750 | total 4.7890 | L_con 2.5279 | L_con_m 2.4391 | L_map 0.0007 | L_sup 2.3466 | L_ortho 0.000000 | L_hard 1.969925 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.404 | cos(-) 0.085 | ln(B) 4.159
+step 12800 | total 4.7040 | L_con 2.4669 | L_con_m 2.4343 | L_map 0.0006 | L_sup 2.2665 | L_ortho 0.000000 | L_hard 1.957128 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.385 | cos(-) 0.065 | ln(B) 4.159
+[val] step 12800 | val_acc=0.0312 | no-improve (24/50)
+step 12850 | total 5.0842 | L_con 2.7142 | L_con_m 2.5865 | L_map 0.0006 | L_sup 2.4944 | L_ortho 0.000000 | L_hard 2.054612 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.266 | cos(+) 0.373 | cos(-) 0.091 | ln(B) 4.159
+step 12900 | total 4.6093 | L_con 2.4537 | L_con_m 2.3467 | L_map 0.0006 | L_sup 2.2594 | L_ortho 0.000000 | L_hard 1.963010 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.266 | cos(+) 0.433 | cos(-) 0.069 | ln(B) 4.159
+step 12950 | total 4.8073 | L_con 2.5699 | L_con_m 2.4193 | L_map 0.0006 | L_sup 2.3849 | L_ortho 0.000000 | L_hard 1.940720 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.409 | cos(-) 0.075 | ln(B) 4.159
+step 13000 | total 4.6147 | L_con 2.4573 | L_con_m 2.3542 | L_map 0.0006 | L_sup 2.2573 | L_ortho 0.000000 | L_hard 1.998407 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.423 | cos(-) 0.105 | ln(B) 4.159
+[val] step 13000 | val_acc=0.0469 | no-improve (25/50)
+step 13050 | total 5.4873 | L_con 2.8809 | L_con_m 2.7113 | L_map 0.0007 | L_sup 2.7726 | L_ortho 0.000000 | L_hard 2.163853 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.408 | cos(-) 0.116 | ln(B) 4.159
+step 13100 | total 5.1819 | L_con 2.7928 | L_con_m 2.6542 | L_map 0.0007 | L_sup 2.5244 | L_ortho 0.000000 | L_hard 2.115185 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.375 | cos(-) 0.052 | ln(B) 4.159
+step 13150 | total 4.7145 | L_con 2.4852 | L_con_m 2.4172 | L_map 0.0006 | L_sup 2.2941 | L_ortho 0.000000 | L_hard 1.997550 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.395 | cos(-) 0.070 | ln(B) 4.159
+step 13200 | total 4.8988 | L_con 2.6102 | L_con_m 2.4837 | L_map 0.0007 | L_sup 2.4118 | L_ortho 0.000000 | L_hard 1.942935 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.397 | cos(-) 0.091 | ln(B) 4.159
+[val] step 13200 | val_acc=0.0312 | no-improve (26/50)
+step 13250 | total 4.9719 | L_con 2.5692 | L_con_m 2.5278 | L_map 0.0006 | L_sup 2.4409 | L_ortho 0.000000 | L_hard 2.028540 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.384 | cos(-) 0.068 | ln(B) 4.159
+step 13300 | total 5.1453 | L_con 2.7673 | L_con_m 2.6012 | L_map 0.0007 | L_sup 2.5409 | L_ortho 0.000000 | L_hard 2.173683 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.394 | cos(-) 0.082 | ln(B) 4.159
+step 13350 | total 4.8977 | L_con 2.6812 | L_con_m 2.4423 | L_map 0.0006 | L_sup 2.4523 | L_ortho 0.000000 | L_hard 1.964392 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.398 | cos(-) 0.100 | ln(B) 4.159
+step 13400 | total 5.0301 | L_con 2.6883 | L_con_m 2.5821 | L_map 0.0006 | L_sup 2.4448 | L_ortho 0.000000 | L_hard 2.023127 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.415 | cos(-) 0.074 | ln(B) 4.159
+[val] step 13400 | val_acc=0.0469 | no-improve (27/50)
+step 13450 | total 4.5859 | L_con 2.4416 | L_con_m 2.2845 | L_map 0.0006 | L_sup 2.2983 | L_ortho 0.000000 | L_hard 1.873935 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.422 | cos(-) 0.085 | ln(B) 4.159
+step 13500 | total 4.8157 | L_con 2.5050 | L_con_m 2.4030 | L_map 0.0007 | L_sup 2.4093 | L_ortho 0.000000 | L_hard 2.081803 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.250 | cos(+) 0.395 | cos(-) 0.068 | ln(B) 4.159
+step 13550 | total 5.2952 | L_con 2.8572 | L_con_m 2.6617 | L_map 0.0007 | L_sup 2.6302 | L_ortho 0.000000 | L_hard 2.122551 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.366 | cos(-) 0.112 | ln(B) 4.159
+step 13600 | total 5.8319 | L_con 3.1454 | L_con_m 2.9304 | L_map 0.0007 | L_sup 2.8981 | L_ortho 0.000000 | L_hard 2.260213 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.344 | cos(-) 0.099 | ln(B) 4.159
+[val] step 13600 | val_acc=0.0469 | no-improve (28/50)
+step 13650 | total 6.0530 | L_con 3.2526 | L_con_m 3.0001 | L_map 0.0007 | L_sup 3.0494 | L_ortho 0.000000 | L_hard 2.113486 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.328 | cos(-) 0.080 | ln(B) 4.159
+step 13700 | total 5.0489 | L_con 2.6010 | L_con_m 2.5444 | L_map 0.0006 | L_sup 2.5013 | L_ortho 0.000000 | L_hard 2.037022 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.234 | cos(+) 0.416 | cos(-) 0.118 | ln(B) 4.159
+step 13750 | total 5.2845 | L_con 2.8716 | L_con_m 2.6981 | L_map 0.0007 | L_sup 2.5830 | L_ortho 0.000000 | L_hard 2.206962 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.381 | cos(-) 0.090 | ln(B) 4.159
+step 13800 | total 5.7789 | L_con 3.1676 | L_con_m 2.9537 | L_map 0.0007 | L_sup 2.8219 | L_ortho 0.000000 | L_hard 2.345408 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.016 | cos(+) 0.375 | cos(-) 0.086 | ln(B) 4.159
+[val] step 13800 | val_acc=0.0469 | no-improve (29/50)
+step 13850 | total 5.1078 | L_con 2.6843 | L_con_m 2.5704 | L_map 0.0007 | L_sup 2.5342 | L_ortho 0.000000 | L_hard 2.063910 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.401 | cos(-) 0.089 | ln(B) 4.159
+step 13900 | total 4.9974 | L_con 2.7973 | L_con_m 2.5917 | L_map 0.0007 | L_sup 2.4024 | L_ortho 0.000000 | L_hard 2.164001 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.375 | cos(-) 0.056 | ln(B) 4.159
+step 13950 | total 6.1051 | L_con 3.2694 | L_con_m 3.1253 | L_map 0.0007 | L_sup 2.9764 | L_ortho 0.000000 | L_hard 2.407969 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.062 | cos(+) 0.374 | cos(-) 0.141 | ln(B) 4.159
+step 14000 | total 5.3108 | L_con 2.8732 | L_con_m 2.6867 | L_map 0.0007 | L_sup 2.6207 | L_ortho 0.000000 | L_hard 2.126815 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.364 | cos(-) 0.095 | ln(B) 4.159
+[val] step 14000 | val_acc=0.0312 | no-improve (30/50)
+step 14050 | total 5.2643 | L_con 2.7639 | L_con_m 2.5812 | L_map 0.0007 | L_sup 2.6797 | L_ortho 0.000000 | L_hard 1.824082 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.250 | cos(+) 0.386 | cos(-) 0.101 | ln(B) 4.159
+step 14100 | total 5.0579 | L_con 2.6528 | L_con_m 2.5206 | L_map 0.0007 | L_sup 2.5340 | L_ortho 0.000000 | L_hard 2.015441 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.234 | cos(+) 0.376 | cos(-) 0.081 | ln(B) 4.159
+step 14150 | total 5.2155 | L_con 2.7560 | L_con_m 2.6123 | L_map 0.0007 | L_sup 2.6000 | L_ortho 0.000000 | L_hard 1.993240 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.219 | cos(+) 0.406 | cos(-) 0.098 | ln(B) 4.159
+step 14200 | total 6.1175 | L_con 3.5814 | L_con_m 3.1157 | L_map 0.0007 | L_sup 2.9983 | L_ortho 0.000000 | L_hard 2.311043 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.341 | cos(-) 0.109 | ln(B) 4.159
+[val] step 14200 | val_acc=0.0625 | no-improve (31/50)
+step 14250 | total 5.0437 | L_con 2.5907 | L_con_m 2.5685 | L_map 0.0007 | L_sup 2.4720 | L_ortho 0.000000 | L_hard 2.018997 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.399 | cos(-) 0.102 | ln(B) 4.159
+step 14300 | total 5.4878 | L_con 2.9469 | L_con_m 2.8014 | L_map 0.0007 | L_sup 2.6831 | L_ortho 0.000000 | L_hard 2.105721 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.353 | cos(-) 0.067 | ln(B) 4.159
+step 14350 | total 4.9765 | L_con 2.6364 | L_con_m 2.5977 | L_map 0.0007 | L_sup 2.3755 | L_ortho 0.000000 | L_hard 2.185115 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.393 | cos(-) 0.096 | ln(B) 4.159
+step 14400 | total 5.2784 | L_con 2.8746 | L_con_m 2.7210 | L_map 0.0007 | L_sup 2.5540 | L_ortho 0.000000 | L_hard 2.072321 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.365 | cos(-) 0.069 | ln(B) 4.159
+[val] step 14400 | val_acc=0.0312 | no-improve (32/50)
+step 14450 | total 5.2447 | L_con 2.7914 | L_con_m 2.6779 | L_map 0.0007 | L_sup 2.5635 | L_ortho 0.000000 | L_hard 2.081593 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.401 | cos(-) 0.086 | ln(B) 4.159
+step 14500 | total 4.7878 | L_con 2.5290 | L_con_m 2.4685 | L_map 0.0007 | L_sup 2.3160 | L_ortho 0.000000 | L_hard 1.917345 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.376 | cos(-) 0.044 | ln(B) 4.159
+step 14550 | total 4.8885 | L_con 2.4752 | L_con_m 2.4145 | L_map 0.0006 | L_sup 2.4708 | L_ortho 0.000000 | L_hard 1.937213 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.409 | cos(-) 0.050 | ln(B) 4.159
+step 14600 | total 4.5553 | L_con 2.4085 | L_con_m 2.3173 | L_map 0.0007 | L_sup 2.2348 | L_ortho 0.000000 | L_hard 1.884109 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.402 | cos(-) 0.061 | ln(B) 4.159
+[val] step 14600 | val_acc=0.0625 | no-improve (33/50)
+step 14650 | total 4.9151 | L_con 2.6770 | L_con_m 2.5419 | L_map 0.0007 | L_sup 2.3700 | L_ortho 0.000000 | L_hard 2.118762 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.402 | cos(-) 0.056 | ln(B) 4.159
+step 14700 | total 4.6821 | L_con 2.5549 | L_con_m 2.3598 | L_map 0.0006 | L_sup 2.3190 | L_ortho 0.000000 | L_hard 1.973446 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.432 | cos(-) 0.083 | ln(B) 4.159
+step 14750 | total 5.4932 | L_con 2.9783 | L_con_m 2.8011 | L_map 0.0007 | L_sup 2.6887 | L_ortho 0.000000 | L_hard 2.147919 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.355 | cos(-) 0.103 | ln(B) 4.159
+step 14800 | total 5.2051 | L_con 2.7638 | L_con_m 2.6653 | L_map 0.0007 | L_sup 2.5365 | L_ortho 0.000000 | L_hard 2.187577 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.392 | cos(-) 0.076 | ln(B) 4.159
+[val] step 14800 | val_acc=0.0781 | no-improve (34/50)
+step 14850 | total 5.0923 | L_con 2.7942 | L_con_m 2.5950 | L_map 0.0007 | L_sup 2.4939 | L_ortho 0.000000 | L_hard 2.045326 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.402 | cos(-) 0.117 | ln(B) 4.159
+step 14900 | total 5.3265 | L_con 2.7606 | L_con_m 2.6750 | L_map 0.0007 | L_sup 2.6480 | L_ortho 0.000000 | L_hard 2.242135 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.219 | cos(+) 0.356 | cos(-) 0.057 | ln(B) 4.159
+step 14950 | total 5.0376 | L_con 2.7811 | L_con_m 2.4897 | L_map 0.0007 | L_sup 2.5446 | L_ortho 0.000000 | L_hard 1.911761 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.362 | cos(-) 0.065 | ln(B) 4.159
+step 15000 | total 5.2477 | L_con 2.7042 | L_con_m 2.6521 | L_map 0.0007 | L_sup 2.5921 | L_ortho 0.000000 | L_hard 2.063062 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.234 | cos(+) 0.376 | cos(-) 0.093 | ln(B) 4.159
+[val] step 15000 | val_acc=0.0469 | no-improve (35/50)
+step 15050 | total 5.2187 | L_con 2.7014 | L_con_m 2.6167 | L_map 0.0007 | L_sup 2.5988 | L_ortho 0.000000 | L_hard 1.956428 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.409 | cos(-) 0.112 | ln(B) 4.159
+step 15100 | total 5.3551 | L_con 2.8548 | L_con_m 2.7092 | L_map 0.0007 | L_sup 2.6426 | L_ortho 0.000000 | L_hard 2.157102 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.366 | cos(-) 0.078 | ln(B) 4.159
+step 15150 | total 5.5652 | L_con 3.1211 | L_con_m 2.8183 | L_map 0.0007 | L_sup 2.7435 | L_ortho 0.000000 | L_hard 2.246562 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.374 | cos(-) 0.117 | ln(B) 4.159
+step 15200 | total 5.3358 | L_con 2.8049 | L_con_m 2.7198 | L_map 0.0007 | L_sup 2.6126 | L_ortho 0.000000 | L_hard 2.008609 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.360 | cos(-) 0.101 | ln(B) 4.159
+[val] step 15200 | val_acc=0.0469 | no-improve (36/50)
+step 15250 | total 5.0505 | L_con 2.6645 | L_con_m 2.5704 | L_map 0.0007 | L_sup 2.4768 | L_ortho 0.000000 | L_hard 2.119990 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.416 | cos(-) 0.129 | ln(B) 4.159
+step 15300 | total 4.6069 | L_con 2.5767 | L_con_m 2.3842 | L_map 0.0007 | L_sup 2.2194 | L_ortho 0.000000 | L_hard 1.879570 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.397 | cos(-) 0.038 | ln(B) 4.159
+step 15350 | total 5.3768 | L_con 2.8619 | L_con_m 2.6949 | L_map 0.0007 | L_sup 2.6786 | L_ortho 0.000000 | L_hard 2.094303 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.411 | cos(-) 0.139 | ln(B) 4.159
+step 15400 | total 4.1467 | L_con 2.1916 | L_con_m 2.0815 | L_map 0.0006 | L_sup 2.0621 | L_ortho 0.000000 | L_hard 1.847799 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.281 | cos(+) 0.428 | cos(-) 0.067 | ln(B) 4.159
+[val] step 15400 | val_acc=0.0625 | no-improve (37/50)
+step 15450 | total 4.9037 | L_con 2.5386 | L_con_m 2.4705 | L_map 0.0006 | L_sup 2.4299 | L_ortho 0.000000 | L_hard 2.079899 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.424 | cos(-) 0.055 | ln(B) 4.159
+step 15500 | total 5.8578 | L_con 3.1924 | L_con_m 3.0011 | L_map 0.0007 | L_sup 2.8533 | L_ortho 0.000000 | L_hard 2.288877 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.062 | cos(+) 0.376 | cos(-) 0.098 | ln(B) 4.159
+step 15550 | total 4.5989 | L_con 2.5357 | L_con_m 2.2274 | L_map 0.0006 | L_sup 2.3683 | L_ortho 0.000000 | L_hard 1.878241 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.250 | cos(+) 0.453 | cos(-) 0.120 | ln(B) 4.159
+step 15600 | total 4.8195 | L_con 2.6197 | L_con_m 2.4597 | L_map 0.0006 | L_sup 2.3567 | L_ortho 0.000000 | L_hard 2.034884 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.417 | cos(-) 0.109 | ln(B) 4.159
+[val] step 15600 | val_acc=0.0625 | no-improve (38/50)
+step 15650 | total 5.1847 | L_con 2.7590 | L_con_m 2.5809 | L_map 0.0007 | L_sup 2.6005 | L_ortho 0.000000 | L_hard 2.067891 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.423 | cos(-) 0.137 | ln(B) 4.159
+step 15700 | total 4.9446 | L_con 2.5519 | L_con_m 2.4575 | L_map 0.0006 | L_sup 2.4839 | L_ortho 0.000000 | L_hard 2.070413 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.438 | cos(-) 0.113 | ln(B) 4.159
+step 15750 | total 5.2376 | L_con 2.8841 | L_con_m 2.7129 | L_map 0.0007 | L_sup 2.5214 | L_ortho 0.000000 | L_hard 2.204907 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.383 | cos(-) 0.101 | ln(B) 4.159
+step 15800 | total 4.5980 | L_con 2.3931 | L_con_m 2.3384 | L_map 0.0007 | L_sup 2.2563 | L_ortho 0.000000 | L_hard 1.912205 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.394 | cos(-) 0.087 | ln(B) 4.159
+[val] step 15800 | val_acc=0.0625 | no-improve (39/50)
+step 15850 | total 5.7297 | L_con 3.0166 | L_con_m 2.9334 | L_map 0.0007 | L_sup 2.7929 | L_ortho 0.000000 | L_hard 2.102730 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.371 | cos(-) 0.106 | ln(B) 4.159
+step 15900 | total 5.3726 | L_con 2.8147 | L_con_m 2.6366 | L_map 0.0007 | L_sup 2.7326 | L_ortho 0.000000 | L_hard 2.165778 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.377 | cos(-) 0.104 | ln(B) 4.159
+step 15950 | total 5.6938 | L_con 3.1561 | L_con_m 2.9583 | L_map 0.0007 | L_sup 2.7320 | L_ortho 0.000000 | L_hard 2.268080 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.330 | cos(-) 0.071 | ln(B) 4.159
+step 16000 | total 5.4586 | L_con 2.7412 | L_con_m 2.7481 | L_map 0.0006 | L_sup 2.7072 | L_ortho 0.000000 | L_hard 2.168749 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.421 | cos(-) 0.108 | ln(B) 4.159
+[val] step 16000 | val_acc=0.0469 | no-improve (40/50)
+step 16050 | total 5.2609 | L_con 2.6677 | L_con_m 2.6542 | L_map 0.0007 | L_sup 2.6033 | L_ortho 0.000000 | L_hard 2.225281 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.370 | cos(-) 0.082 | ln(B) 4.159
+step 16100 | total 4.8802 | L_con 2.4678 | L_con_m 2.3936 | L_map 0.0007 | L_sup 2.4833 | L_ortho 0.000000 | L_hard 1.887044 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.393 | cos(-) 0.098 | ln(B) 4.159
+step 16150 | total 5.0393 | L_con 2.7155 | L_con_m 2.5728 | L_map 0.0007 | L_sup 2.4632 | L_ortho 0.000000 | L_hard 1.937381 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.357 | cos(-) 0.053 | ln(B) 4.159
+step 16200 | total 5.3876 | L_con 2.8939 | L_con_m 2.7468 | L_map 0.0007 | L_sup 2.6375 | L_ortho 0.000000 | L_hard 2.138727 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.109 | cos(+) 0.397 | cos(-) 0.156 | ln(B) 4.159
+[val] step 16200 | val_acc=0.0469 | no-improve (41/50)
+step 16250 | total 4.4593 | L_con 2.3772 | L_con_m 2.2516 | L_map 0.0006 | L_sup 2.2045 | L_ortho 0.000000 | L_hard 1.916509 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.266 | cos(+) 0.446 | cos(-) 0.074 | ln(B) 4.159
+step 16300 | total 5.0891 | L_con 2.7167 | L_con_m 2.5663 | L_map 0.0007 | L_sup 2.5195 | L_ortho 0.000000 | L_hard 2.125622 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.394 | cos(-) 0.109 | ln(B) 4.159
+step 16350 | total 5.6763 | L_con 3.0449 | L_con_m 2.8947 | L_map 0.0007 | L_sup 2.7782 | L_ortho 0.000000 | L_hard 2.132125 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.062 | cos(+) 0.328 | cos(-) 0.061 | ln(B) 4.159
+step 16400 | total 5.2882 | L_con 2.8446 | L_con_m 2.7465 | L_map 0.0007 | L_sup 2.5384 | L_ortho 0.000000 | L_hard 2.088315 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.388 | cos(-) 0.095 | ln(B) 4.159
+[val] step 16400 | val_acc=0.0625 | no-improve (42/50)
+step 16450 | total 4.7454 | L_con 2.5994 | L_con_m 2.4050 | L_map 0.0006 | L_sup 2.3371 | L_ortho 0.000000 | L_hard 1.977918 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.391 | cos(-) 0.060 | ln(B) 4.159
+step 16500 | total 5.0957 | L_con 2.8301 | L_con_m 2.6202 | L_map 0.0007 | L_sup 2.4721 | L_ortho 0.000000 | L_hard 2.089422 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.156 | cos(+) 0.390 | cos(-) 0.067 | ln(B) 4.159
+step 16550 | total 5.5915 | L_con 3.0018 | L_con_m 2.8711 | L_map 0.0007 | L_sup 2.7170 | L_ortho 0.000000 | L_hard 2.203089 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.375 | cos(-) 0.118 | ln(B) 4.159
+step 16600 | total 5.5682 | L_con 2.9600 | L_con_m 2.7876 | L_map 0.0007 | L_sup 2.7772 | L_ortho 0.000000 | L_hard 2.198211 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.337 | cos(-) 0.042 | ln(B) 4.159
+[val] step 16600 | val_acc=0.0625 | no-improve (43/50)
+step 16650 | total 5.0313 | L_con 2.6277 | L_con_m 2.5301 | L_map 0.0007 | L_sup 2.4980 | L_ortho 0.000000 | L_hard 2.120669 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.390 | cos(-) 0.079 | ln(B) 4.159
+step 16700 | total 5.1612 | L_con 2.6595 | L_con_m 2.6191 | L_map 0.0007 | L_sup 2.5388 | L_ortho 0.000000 | L_hard 2.140126 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.416 | cos(-) 0.134 | ln(B) 4.159
+step 16750 | total 4.8983 | L_con 2.6663 | L_con_m 2.4792 | L_map 0.0006 | L_sup 2.4159 | L_ortho 0.000000 | L_hard 1.979116 | L_dec 0.0033 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.418 | cos(-) 0.082 | ln(B) 4.159
+step 16800 | total 5.1980 | L_con 2.8956 | L_con_m 2.6220 | L_map 0.0007 | L_sup 2.5727 | L_ortho 0.000000 | L_hard 2.047129 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.385 | cos(-) 0.061 | ln(B) 4.159
+[val] step 16800 | val_acc=0.0625 | no-improve (44/50)
+step 16850 | total 5.5079 | L_con 2.9315 | L_con_m 2.8122 | L_map 0.0007 | L_sup 2.6923 | L_ortho 0.000000 | L_hard 2.246473 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.356 | cos(-) 0.084 | ln(B) 4.159
+step 16900 | total 4.4726 | L_con 2.3525 | L_con_m 2.3089 | L_map 0.0007 | L_sup 2.1604 | L_ortho 0.000000 | L_hard 1.939440 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.203 | cos(+) 0.385 | cos(-) 0.052 | ln(B) 4.159
+step 16950 | total 4.7215 | L_con 2.6802 | L_con_m 2.3411 | L_map 0.0007 | L_sup 2.3772 | L_ortho 0.000000 | L_hard 1.997733 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.219 | cos(+) 0.386 | cos(-) 0.060 | ln(B) 4.159
+step 17000 | total 4.7522 | L_con 2.5786 | L_con_m 2.4306 | L_map 0.0006 | L_sup 2.3184 | L_ortho 0.000000 | L_hard 1.901564 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.386 | cos(-) 0.068 | ln(B) 4.159
+[val] step 17000 | val_acc=0.0469 | no-improve (45/50)
+step 17050 | total 5.2158 | L_con 2.7779 | L_con_m 2.6114 | L_map 0.0007 | L_sup 2.6011 | L_ortho 0.000000 | L_hard 1.958409 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.392 | cos(-) 0.081 | ln(B) 4.159
+step 17100 | total 5.2560 | L_con 2.7847 | L_con_m 2.6286 | L_map 0.0006 | L_sup 2.6242 | L_ortho 0.000000 | L_hard 2.039254 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.125 | cos(+) 0.426 | cos(-) 0.144 | ln(B) 4.159
+step 17150 | total 6.1104 | L_con 3.2447 | L_con_m 3.0801 | L_map 0.0007 | L_sup 3.0268 | L_ortho 0.000000 | L_hard 2.363070 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.094 | cos(+) 0.340 | cos(-) 0.107 | ln(B) 4.159
+step 17200 | total 5.1001 | L_con 2.6054 | L_con_m 2.5813 | L_map 0.0007 | L_sup 2.5154 | L_ortho 0.000000 | L_hard 1.928274 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.363 | cos(-) 0.060 | ln(B) 4.159
+[val] step 17200 | val_acc=0.0469 | no-improve (46/50)
+step 17250 | total 4.8655 | L_con 2.6493 | L_con_m 2.4560 | L_map 0.0007 | L_sup 2.4061 | L_ortho 0.000000 | L_hard 2.106334 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.219 | cos(+) 0.397 | cos(-) 0.070 | ln(B) 4.159
+step 17300 | total 5.2716 | L_con 3.0240 | L_con_m 2.6276 | L_map 0.0007 | L_sup 2.6406 | L_ortho 0.000000 | L_hard 2.089580 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.364 | cos(-) 0.053 | ln(B) 4.159
+step 17350 | total 4.5427 | L_con 2.4518 | L_con_m 2.3654 | L_map 0.0007 | L_sup 2.1740 | L_ortho 0.000000 | L_hard 2.018883 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.234 | cos(+) 0.395 | cos(-) 0.084 | ln(B) 4.159
+step 17400 | total 5.0452 | L_con 2.6625 | L_con_m 2.5771 | L_map 0.0007 | L_sup 2.4647 | L_ortho 0.000000 | L_hard 2.128937 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.416 | cos(-) 0.138 | ln(B) 4.159
+[val] step 17400 | val_acc=0.0469 | no-improve (47/50)
+step 17450 | total 4.8028 | L_con 2.4590 | L_con_m 2.5024 | L_map 0.0007 | L_sup 2.2972 | L_ortho 0.000000 | L_hard 2.044617 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.250 | cos(+) 0.397 | cos(-) 0.106 | ln(B) 4.159
+step 17500 | total 5.0544 | L_con 2.7986 | L_con_m 2.5619 | L_map 0.0007 | L_sup 2.4891 | L_ortho 0.000000 | L_hard 2.057642 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.389 | cos(-) 0.055 | ln(B) 4.159
+step 17550 | total 4.7356 | L_con 2.5770 | L_con_m 2.4391 | L_map 0.0007 | L_sup 2.2931 | L_ortho 0.000000 | L_hard 2.017998 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.369 | cos(-) 0.048 | ln(B) 4.159
+step 17600 | total 4.6670 | L_con 2.5618 | L_con_m 2.3035 | L_map 0.0006 | L_sup 2.3602 | L_ortho 0.000000 | L_hard 1.936149 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.219 | cos(+) 0.408 | cos(-) 0.036 | ln(B) 4.159
+[val] step 17600 | val_acc=0.0469 | no-improve (48/50)
+step 17650 | total 4.9202 | L_con 2.7541 | L_con_m 2.5236 | L_map 0.0007 | L_sup 2.3933 | L_ortho 0.000000 | L_hard 2.070739 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.172 | cos(+) 0.397 | cos(-) 0.075 | ln(B) 4.159
+step 17700 | total 5.1024 | L_con 2.7346 | L_con_m 2.5816 | L_map 0.0007 | L_sup 2.5175 | L_ortho 0.000000 | L_hard 2.076736 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.419 | cos(-) 0.119 | ln(B) 4.159
+step 17750 | total 4.9992 | L_con 2.7605 | L_con_m 2.5464 | L_map 0.0007 | L_sup 2.4496 | L_ortho 0.000000 | L_hard 2.105773 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.377 | cos(-) 0.071 | ln(B) 4.159
+step 17800 | total 4.8623 | L_con 2.5597 | L_con_m 2.4429 | L_map 0.0007 | L_sup 2.4161 | L_ortho 0.000000 | L_hard 1.879905 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.188 | cos(+) 0.387 | cos(-) 0.087 | ln(B) 4.159
+[val] step 17800 | val_acc=0.0469 | no-improve (49/50)
+step 17850 | total 4.7478 | L_con 2.6306 | L_con_m 2.4205 | L_map 0.0007 | L_sup 2.3240 | L_ortho 0.000000 | L_hard 2.011506 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.219 | cos(+) 0.401 | cos(-) 0.063 | ln(B) 4.159
+step 17900 | total 4.5491 | L_con 2.3560 | L_con_m 2.2563 | L_map 0.0006 | L_sup 2.2896 | L_ortho 0.000000 | L_hard 1.850167 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.266 | cos(+) 0.420 | cos(-) 0.077 | ln(B) 4.159
+step 17950 | total 5.1156 | L_con 2.7918 | L_con_m 2.6810 | L_map 0.0007 | L_sup 2.4311 | L_ortho 0.000000 | L_hard 2.208127 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.141 | cos(+) 0.367 | cos(-) 0.063 | ln(B) 4.159
+step 18000 | total 5.3220 | L_con 2.8976 | L_con_m 2.7048 | L_map 0.0007 | L_sup 2.6139 | L_ortho 0.000000 | L_hard 1.983557 | L_dec 0.0032 | L_fwd 0.0010 | acc@1 0.219 | cos(+) 0.381 | cos(-) 0.090 | ln(B) 4.159
+[val] step 18000 | val_acc=0.0469 | no-improve (50/50)
+[early-stop] patience exhausted at step 18000. Best val_acc so far=-0.0781
+[done] real training complete.
