@@ -21,6 +21,9 @@ This script will:
 - Filter by fold (e.g., `test`)
 - Use 16 worker processes for parallelization
 
+### Getting DreaMS ckpt:
+Weights of pre-trained models: [https://zenodo.org/records/10997887](https://zenodo.org/records/10997887)
+
 ### Running Evaluation
 
 To evaluate the model on a dataset with candidates:
