@@ -19,10 +19,11 @@ dependencies = [
 rdkit = ["rdkit-pypi>=2022.9.5"]
 dreams = ["wandb>=0.16.4"]
 
+[tool.setuptools]
+packages = ["specbridge", "molgpt"]
+
 [project.scripts]
 specbridge = "specbridge.cli:main"
 
-[tool.setuptools.packages.find]
-include = ["specbridge*"]
-exclude = ["data*", "DreaMS*"]
+
 

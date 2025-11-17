@@ -1,5 +1,8 @@
 from __future__ import annotations
 from typing import Optional
+from argparse import Namespace
+from pathlib import Path
+import types
 import torch
 import torch.nn as nn
 from specbridge.utils.common import unit_normalize
@@ -16,7 +19,101 @@ class DummyDreams(nn.Module):
         return self.net(spectra_binned)
 
 
-def load_dreams_encoder(dreams_ckpt: Optional[str] = None, d_in: int = 2048, d_out: int = 1024) -> nn.Module:
+def _create_default_dreams_args(n_highest_peaks: int = 60):
+    """Create default arguments for DreaMS model initialization.
+    
+    Default values are based on the DreaMS pre-training configuration.
+    """
+    from dreams.utils.dformats import DataFormatA  # type: ignore
+    
+    dformat = DataFormatA()
+    
+    args = Namespace(
+        gains_dir=Path('.'),
+        n_layers=7,
+        n_heads=8,
+        train_objective='mask_mz_hot',
+        lr=1e-4,
+        weight_decay=0.0,
+        charge_feature=False,
+        d_fourier=980,
+        d_peak=44,
+        d_mz_token=0,
+        dformat=dformat,
+        hot_mz_bin_size=0.05,
+        n_warmup_steps=5000,
+        vanilla_transformer=False,
+        batch_size=32,
+        log_figs=False,
+        entropy_label_smoothing=0.0,
+        graphormer_mz_diffs=True,
+        graphormer_parametrized=False,
+        fourier_strategy='lin_float_int',
+        ret_order_loss_w=0.0,
+        cos_reg_alpha=0.0,
+        cos_reg_reduction=None,
+        mask_val=-1.0,
+        fourier_num_freqs=512,  # Not used with lin_float_int but required parameter
+        fourier_trainable=False,
+        fourier_min_freq=None,
+        dropout=0.1,
+        focal_loss_gamma=5.0,  # Used for mask_mz_hot objective
+        focal_loss_alpha=None,
+        att_dropout=0.1,
+        residual_dropout=0.1,
+        ff_dropout=0.1,
+        ff_fourier_depth=5,
+        ff_fourier_d=512,
+        ff_peak_depth=1,
+        ff_out_depth=1,
+        no_ffs_bias=False,
+        no_transformer_bias=True,
+        pre_norm=True,
+        scnorm=False,
+        attn_mech='dot-product',
+    )
+    return args
+
+
+def load_dreams_encoder(dreams_ckpt: Optional[str] = None, d_in: int = 2048, d_out: int = 1024, 
+                        init_from_scratch: bool = False, n_highest_peaks: int = 60) -> nn.Module:
+    """
+    Load DreaMS encoder from checkpoint or initialize from scratch.
+    
+    Args:
+        dreams_ckpt: Path to checkpoint file. If None and init_from_scratch=False, uses dummy encoder.
+        d_in: Input dimension for dummy encoder (only used if no checkpoint and not init_from_scratch).
+        d_out: Output dimension for dummy encoder (only used if no checkpoint and not init_from_scratch).
+        init_from_scratch: If True, initialize DreaMS model from scratch without loading checkpoint.
+        n_highest_peaks: Number of highest peaks to use (for initialization from scratch or checkpoint loading).
+    
+    Returns:
+        DreaMS encoder model in eval mode.
+    """
+    # Try to initialize from scratch if requested
+    if init_from_scratch:
+        try:
+            from dreams.models.dreams.dreams import DreaMS as DreaMSModel  # type: ignore
+            import dreams.utils.data as du  # type: ignore
+            import dreams.utils.dformats as dformats  # type: ignore
+            
+            args = _create_default_dreams_args(n_highest_peaks=n_highest_peaks)
+            spec_preproc = du.SpectrumPreprocessor(
+                dformat=dformats.DataFormatA(),
+                n_highest_peaks=n_highest_peaks
+            )
+            model = DreaMSModel(args, spec_preproc)
+            # Set embed_dim for compatibility with DreamsAdapter
+            model.embed_dim = model.d_model
+            print(f"Initialized DreaMS model from scratch (n_highest_peaks={n_highest_peaks}, embed_dim={model.embed_dim})")
+            return model
+        except Exception as e:
+            print(f"Error initializing DreaMS from scratch: {e}")
+            if init_from_scratch:
+                raise
+            # Fall through to checkpoint loading or dummy
+    
+    # Try to load from checkpoint
     if dreams_ckpt is not None:
         try:
             from dreams.api import PreTrainedModel  # type: ignore
@@ -24,28 +121,35 @@ def load_dreams_encoder(dreams_ckpt: Optional[str] = None, d_in: int = 2048, d_o
             ptm = PreTrainedModel.from_ckpt(
                 ckpt_path=dreams_ckpt,
                 ckpt_cls=DreaMSModel,
-                n_highest_peaks=60,
+                n_highest_peaks=n_highest_peaks,
             )
             model = ptm.model
+            print(f"Using dreams encoder from checkpoint {dreams_ckpt}")
             return model.eval()
-        except Exception:
+        except Exception as e:
+            print(f"Error using dreams encoder from checkpoint {dreams_ckpt}: {e}")
             pass
         try:
             from dreams import DreamsEncoder  # type: ignore
             model = DreamsEncoder.load_from_checkpoint(dreams_ckpt)
+            print(f"Using dreams encoder from checkpoint {dreams_ckpt} using DreamsEncoder")
             return model.eval()
-        except Exception:
+        except Exception as e:
+            print(f"Error using dreams encoder from checkpoint {dreams_ckpt} using DreamsEncoder: {e}")
             pass
+    
+    # Fall back to dummy encoder
+    print(f"Using dummy dreams encoder")
     model = DummyDreams(d_in=d_in, d_out=d_out)
-    if dreams_ckpt is None:
-        return model
-    try:
-        sd = torch.load(dreams_ckpt, map_location='cpu')
-        if isinstance(sd, dict) and 'state_dict' in sd:
-            sd = sd['state_dict']
-        model.load_state_dict(sd, strict=False)
-    except Exception:
-        pass
+    if dreams_ckpt is not None:
+        try:
+            sd = torch.load(dreams_ckpt, map_location='cpu')
+            if isinstance(sd, dict) and 'state_dict' in sd:
+                sd = sd['state_dict']
+            model.load_state_dict(sd, strict=False)
+        except Exception as e:
+            print(f"Warning: Could not load DreaMS checkpoint {dreams_ckpt}: {e}")
+            pass
     return model
 
 
@@ -90,7 +194,31 @@ class DreamsAdapter(nn.Module):
         return pooled
 
     def forward(self, spectra_binned, meta):
-        with torch.no_grad():
+        # Only use no_grad if all parameters are frozen
+        use_no_grad = not any(p.requires_grad for p in self.dreams.parameters())
+        
+        # Patch __normalize_spec to use input tensor's device/dtype instead of self.device/self.dtype
+        # This fixes device mismatch issues when model is called directly (not through PyTorch Lightning)
+        if not hasattr(self.dreams, '_normalize_spec_patched'):
+            def patched_normalize(self, spec):
+                # Use spec's device and dtype instead of self.device/self.dtype
+                return spec / torch.tensor([self.dformat.max_mz, 1.], device=spec.device, dtype=spec.dtype)
+            # Bind the patched method to the instance
+            self.dreams._DreaMS__normalize_spec = types.MethodType(patched_normalize, self.dreams)
+            self.dreams._normalize_spec_patched = True
+        
+        if use_no_grad:
+            with torch.no_grad():
+                if isinstance(meta, dict) and 'peaks' in meta and isinstance(meta['peaks'], torch.Tensor):
+                    out = self.dreams(meta['peaks'], meta)  # could be [B,N,D] or [B,D]
+                    if out.dim() == 3:
+                        z0 = self._pool(out, meta['peaks'])
+                    else:
+                        z0 = out
+                else:
+                    z0 = self.dreams(spectra_binned, meta)
+        else:
+            # When encoder is trainable, don't use no_grad
             if isinstance(meta, dict) and 'peaks' in meta and isinstance(meta['peaks'], torch.Tensor):
                 out = self.dreams(meta['peaks'], meta)  # could be [B,N,D] or [B,D]
                 if out.dim() == 3:

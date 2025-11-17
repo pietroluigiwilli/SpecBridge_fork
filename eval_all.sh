@@ -2,21 +2,24 @@
 set -uo pipefail
 
 # ========= Edit these to match your run =========
-RUN_DIR="runs/specbridge_align_chemberta_v4"            # folder with ckpt_*.pt
+RUN_DIR="runs/specbridge_align_chemberta_pub_v3g_ablation_scratch"            # folder with ckpt_*.pt
 MGF="/cluster/tufts/liulab/yiwan01/SpecBridge/data/MassSpecGym.mgf"
 DREAMS="/cluster/tufts/liulab/yiwan01/SpecBridge/data/ssl_model.ckpt"
-CANDS="/cluster/tufts/liulab/yiwan01/massspecgym/cand_dict_large_form.pkl"
-FOLD="test"
-BATCH=64
-LIMIT=1000
+# CANDS="/cluster/tufts/liulab/yiwan01/massspecgym/cand_dict_large_form.pkl"
+CANDS="/cluster/tufts/liulab/yiwan01/SpecBridge/data/cand_dict_large_smiles.pkl"
+CANDS="/cluster/tufts/liulab/yiwan01/SpecBridge/data/MassSpecGym_retrieval_candidates_formula.json"
+# CANDS="/cluster/tufts/liulab/yiwan01/SpecBridge/data/spectraverse_cand.pkl"
+FOLD="val"
+BATCH=16
+LIMIT=100000
 
 # Embedding space (pick ONE block)
 MOL_SPACE="chemberta"                                 # chemberta | ecfp | adapter
 COND_DIM=2048
 MAPPER_HIDDEN=2048
-CACHE="/cluster/tufts/liulab/yiwan01/SpecBridge/cache/cands_${FOLD}_chemberta.pt"
-CHEMBERTA_MODEL="seyonec/ChemBERTa-zinc-base-v1"
-
+CACHE="/cluster/tufts/liulab/yiwan01/SpecBridge/cache/cands_${FOLD}_chemberta_pub_v3g_scratch.pt"
+CHEMBERTA_MODEL="Derify/ChemBERTa_augmented_pubchem_13m"
+# CHEMBERTA_MODEL="laituan245/molt5-base"
 # If you switch to ECFP:
 # MOL_SPACE="ecfp"
 # COND_DIM=1024
@@ -38,7 +41,7 @@ mkdir -p "${LOGDIR}"
 
 # Write header if new
 if [[ ! -f "${OUTCSV}" ]]; then
-  echo "ckpt,step,R@1,R@5,R@10,MRR,median_rank,total_queries,evaluated" > "${OUTCSV}"
+  echo "ckpt,step,R@1,R@5,R@20,MRR,median_rank,total_queries,evaluated" > "${OUTCSV}"
 fi
 
 # Build common args
@@ -52,6 +55,7 @@ COMMON=(
   --cond-dim "${COND_DIM}" --mapper-hidden "${MAPPER_HIDDEN}"
   --mol-space "${MOL_SPACE}"
   --cache-cand-emb "${CACHE}"
+  --no-gaussian
 )
 
 # Add mol-space specific args
@@ -92,7 +96,7 @@ for CK in "${RUN_DIR}"/*.pt; do
   # Parse metrics from the log
   R1=$(awk '/R@1:/  {print $2}'  "${LOG}")
   R5=$(awk '/R@5:/  {print $2}'  "${LOG}")
-  R10=$(awk '/R@10:/ {print $2}' "${LOG}")
+  R20=$(awk '/R@20:/ {print $2}' "${LOG}")
   MRR=$(awk '/MRR:/  {print $2}' "${LOG}")
   MED=$(awk '/median_rank:/ {print $2}' "${LOG}")
   # parse the [eval] line
@@ -100,11 +104,11 @@ for CK in "${RUN_DIR}"/*.pt; do
   TOT=$(awk -F'[=| ]+' '/^\[eval\]/ {for(i=1;i<=NF;i++) if($i ~ /total_queries/) print $(i+1)}' "${LOG}")
   EVD=$(awk -F'[=| ]+' '/^\[eval\]/ {for(i=1;i<=NF;i++) if($i ~ /evaluated/) print $(i+1)}' "${LOG}")
 
-  echo "${CK},${STEP},${R1},${R5},${R10},${MRR},${MED},${TOT},${EVD}" >> "${OUTCSV}"
+  echo "${CK},${STEP},${R1},${R5},${R20},${MRR},${MED},${TOT},${EVD}" >> "${OUTCSV}"
 done
 
 echo
 echo "Summary written to: ${OUTCSV}"
-echo "Top 5 by R@10:"
-# pretty print top 5 by R@10
-( head -n1 "${OUTCSV}"; tail -n +2 "${OUTCSV}" | sort -t',' -k5,5gr ) | head -n6 | column -s, -t
+echo "Top 5 by R@5:"
+# pretty print top 5 by R@1
+( head -n1 "${OUTCSV}"; tail -n +2 "${OUTCSV}" | sort -t',' -k4,4gr ) | head -n6 | column -s, -t

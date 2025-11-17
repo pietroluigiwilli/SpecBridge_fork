@@ -1,5 +1,9 @@
 runs/
 data/
 cache/
+wandb/
+analysis_ms/
 *.err
 *.log
+.vscode/
+__pycache__/

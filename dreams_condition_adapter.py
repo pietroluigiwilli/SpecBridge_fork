@@ -20,6 +20,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 import os
+import wandb
 from transformers import AutoTokenizer, AutoModel
 
 # Use spawn so CUDA works with DataLoader workers on most clusters
@@ -34,12 +35,33 @@ from specbridge.utils.common import set_seed, unit_normalize, ln_baseline,_topk_
 from specbridge.adapters.dreams_adapter import DummyDreams, load_dreams_encoder, DreamsAdapter
 from specbridge.models.mol import MolFeaturizer, MolEncoder, MolAdapter
 from specbridge.data.massspecgym import MassSpecGymDataset, collate_massspecgym, validate_dataset, bin_peaks
-from specbridge.models.mapper import MapperB
-from specbridge.losses.contrastive import InfoNCELoss, _embed_smiles_list, isomer_ce
-from specbridge.losses.supcon import supcon_loss
+from specbridge.models.mapper import MapperB, DreamsToMolCondition
 from specbridge.losses.forward import ForwardSpectralLoss
 from specbridge.predictors.toy import ToySpecPredictor
 from specbridge.data.sampler import BalancedBatchSampler, ReplicateBatchSampler
+import random, numpy as np
+from contextlib import contextmanager
+
+@contextmanager
+def preserve_rng():
+    py_state = random.getstate()
+    np_state = np.random.get_state()
+    t_cpu = torch.get_rng_state()
+    t_cuda = torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None
+    try:
+        yield
+    finally:
+        random.setstate(py_state)
+        np.random.set_state(np_state)
+        torch.set_rng_state(t_cpu)
+        if t_cuda is not None:
+            torch.cuda.set_rng_state_all(t_cuda)
+
+def seed_worker(worker_id):
+    # deterministic but distinct per worker
+    worker_seed = (torch.initial_seed() + worker_id) % 2**32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
 
 # ================================================================
 # Conditioning mix helper
@@ -83,169 +105,42 @@ from specbridge.decoders.toy import ToyDecoder
 @torch.no_grad()
 def run_val(model, dl_val, args) -> dict:
     model.eval()
-    device = next(model.parameters()).device  # <<< was missing
+    device = next(model.parameters()).device
 
     totals = {'total': 0.0, 'L_con': 0.0, 'L_con_m': 0.0, 'L_sup': 0.0, 'L_map': 0.0}
     count = 0
+    acc_sum = 0.0
 
     for bi, batch in enumerate(dl_val):
         if bi >= args.val_batches:
             break
-
-        # mirror train: move to device
         s = batch['spectra'].to(device, non_blocking=True)
         m = batch['mol_feats'].to(device, non_blocking=True)
         meta = {k: (v.to(device, non_blocking=True) if torch.is_tensor(v) else v)
                 for k, v in batch['meta'].items()}
 
-        # forward -> embeddings
+        # NOTE: use mapped for metrics
         z_s, z_m, z_hat, mu_s, lv_s = model(s, meta, m, inference=True)
-        acc1, cos_pos, cos_neg = _inbatch_diag_metrics(z_s, z_m)
-        # keys for SupCon (if present)
-        keys = meta.get("smi_key", None)
+        acc1, _, _ = _inbatch_diag_metrics(mu_s, z_m)  # <-- changed
 
-        # alignment losses (no raw 'smiles' arg)
         L_align, logs = model.align_losses(
             z_s, z_m, mu_s, lv_s,
-            w_con=args.w_con,
-            w_con_mapped=args.w_con_mapped,
-            w_map=args.w_map,
-            w_ortho=args.w_ortho,
-            supcon_keys=keys,
-            w_sup=args.w_supcon,
-            sup_temp=args.supcon_temp,
+            w_con=args.w_con, w_con_mapped=args.w_con_mapped,
+            w_map=args.w_map, w_ortho=args.w_ortho,
+            supcon_keys=meta.get("smi_key", None),
+            w_sup=args.w_supcon, sup_temp=args.supcon_temp,
             stop_mol_in_con=not args.allow_mol_update_in_con,
         )
 
         totals['total'] += float(L_align.item())
         for k in ('L_con','L_con_m','L_sup','L_map'):
-            if k in logs:
-                totals[k] += float(logs[k])
+            if k in logs: totals[k] += float(logs[k])
+        acc_sum += float(acc1)
         count += 1
 
-    for k in totals:
-        totals[k] /= max(count, 1)
-    return {f'val_{k}': v for k, v in totals.items()}, acc1
-
-
-# ================================================================
-# End-to-end adapter wrapper
-# ================================================================
-
-class DreamsToMolCondition(nn.Module):
-    def __init__(
-        self,
-        dreams_encoder: nn.Module,
-        mol_encoder: nn.Module,
-        d_out: int = 512,
-        mapper_hidden: int = 0,
-        gaussian: bool = True,
-        mol_space: str = "adapter",
-        chemberta_model: str | None = None,
-        fp_bits: int = 2048,
-    ):
-        super().__init__()
-        self.mol_space = mol_space
-        self.fp_bits = fp_bits
-
-        # spec branch (frozen backbone, learnable proj already inside DreamsAdapter)
-        self.spec = DreamsAdapter(dreams_encoder, d_out=d_out, hidden=0, freeze_backbone=True)
-
-        # mol branch: either learnable adapter (legacy) or frozen pretrained
-        if mol_space == "adapter":
-            self.mol = MolAdapter(mol_encoder, d_out=d_out, hidden=0)  # trainable
-            self.chem_tok = None
-            self.chem_mdl = None
-            self.chem_proj = None
-        elif mol_space == "ecfp":
-            # No learnable parameters needed for fixed ECFP space.
-            # We may still want a registered buffer if you later add a learned projection,
-            # but for now we normalize the raw 0/1 vector and expect cond_dim == fp_bits.
-            self.mol = None
-            self.chem_tok = None
-            self.chem_mdl = None
-            self.chem_proj = None
-        elif mol_space == "chemberta":
-            assert chemberta_model is not None, "Provide --chemberta-model for --mol-space chemberta"
-            from transformers import AutoTokenizer, AutoModel
-            self.chem_tok = AutoTokenizer.from_pretrained(chemberta_model)
-            self.chem_mdl = AutoModel.from_pretrained(chemberta_model)
-            for p in self.chem_mdl.parameters():
-                p.requires_grad = False  # freeze ChemBERTa
-            hid = int(self.chem_mdl.config.hidden_size)
-            # Trainable projection into your conditioning space
-            self.chem_proj = nn.Linear(hid, d_out)
-            self.mol = None
-        else:
-            raise ValueError(f"Unknown mol_space: {mol_space}")
-
-        # mapper and contrastive loss
-        self.mapB = MapperB(d=d_out, hidden=mapper_hidden, gaussian=gaussian)
-        self.contrast = InfoNCELoss(temperature=0.07, learnable_temp=True)
-
-    def _chemberta_embed(self, smiles: list[str], device: torch.device) -> torch.Tensor:
-        assert self.chem_tok is not None and self.chem_mdl is not None and self.chem_proj is not None
-        toks = self.chem_tok(smiles, padding=True, truncation=True, return_tensors="pt").to(device)
-        with torch.no_grad():  # model is frozen
-            h = self.chem_mdl(**toks).last_hidden_state[:, 0]  # CLS [B, hidden]
-        z = self.chem_proj(h)  # trainable projection
-        return F.normalize(z, dim=-1)
-
-    def forward(self, spectra_binned, meta, mol_feats, inference: bool = False):
-        """
-        meta must include a list[str] SMILES under key 'smi_key' (or 'smiles').
-        mol_feats is only used when mol_space == 'ecfp' (0/1 fingerprint tensor).
-        """
-        z_s = self.spec(spectra_binned, meta)
-
-        if self.mol_space == "adapter":
-            z_m = self.mol(mol_feats)  # trainable fp->cond
-        elif self.mol_space == "ecfp":
-            # Expect shape [B, fp_bits]; set cond_dim == fp_bits, or add an explicit learnable proj here if you want.
-            z_m = F.normalize(mol_feats.float(), dim=-1)
-        elif self.mol_space == "chemberta":
-            smiles = meta.get("smi_key", None) or meta.get("smiles", None)
-            if smiles is None:
-                raise RuntimeError("Need meta['smi_key'] or meta['smiles'] (list[str]) for ChemBERTa embedding.")
-            z_m = self._chemberta_embed(smiles, z_s.device)
-        else:
-            raise RuntimeError("unreachable")
-
-        mu_s, lv_s = self.mapB(z_s)
-        z_hat = self.mapB.sample(mu_s, lv_s, deterministic=inference)
-        return z_s, z_m, z_hat, mu_s, lv_s
-
-    def align_losses(
-        self,
-        z_s, z_m, mu_s, lv_s,
-        w_con=1.0, w_map=1.0, w_ortho=1e-3, w_con_mapped=1.0,
-        stop_mol_in_con=True,
-        supcon_keys=None, w_sup=0.0, sup_temp=0.07,
-    ):
-        z_s_n = F.normalize(z_s, dim=-1)
-        z_m_n = F.normalize(z_m, dim=-1)
-        mu_n  = F.normalize(mu_s, dim=-1)
-
-        z_m_for_con = z_m_n.detach() if stop_mol_in_con else z_m_n
-        L_con   = self.contrast(z_s_n, z_m_for_con)
-        L_con_m = self.contrast(mu_n, z_m_n.detach())
-        L_map   = F.mse_loss(mu_n, z_m_n.detach())
-        L_ortho = self.mapB.orthogonality_penalty() * w_ortho
-
-        L_sup = torch.tensor(0.0, device=z_s.device)
-        if (w_sup > 0.0) and (supcon_keys is not None):
-            L_sup = supcon_loss(z_s, z_m, supcon_keys, temperature=sup_temp)
-
-        L = (w_con * L_con) + (w_con_mapped * L_con_m) + (w_map * L_map) + L_ortho + (w_sup * L_sup)
-        logs = {"L_con": L_con.detach(), "L_con_m": L_con_m.detach(), "L_map": L_map.detach(),
-                "L_ortho": L_ortho.detach(), "L_sup": L_sup.detach()}
-        return L, logs
-
-
-
-
-
-
+    for k in totals: totals[k] /= max(count, 1)
+    val_acc = acc_sum / max(count, 1)
+    return {f'val_{k}': v for k, v in totals.items()}, val_acc
 
 
 def _inbatch_diag_metrics(z_s: torch.Tensor, z_m: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
@@ -300,6 +195,9 @@ def make_synthetic_batch(B: int, spec_bins: int, fp_bits: int, device: torch.dev
 def train_demo(args):
     device = torch.device("cuda" if torch.cuda.is_available() and not args.cpu else "cpu")
     set_seed(args.seed)
+    
+    # Initialize wandb
+    wandb_run = wandb.init()
 
     dreams_backbone = load_dreams_encoder(args.dreams_ckpt, d_in=args.spec_bins, d_out=1024)
     mol_encoder = MolEncoder(d_in=args.fp_bits, embed_dim=512)
@@ -371,8 +269,29 @@ def train_demo(args):
                 f"L_map {logs['L_map'].item():.4f} | L_dec {L_dec.item():.4f} | L_fwd {L_fwd.item():.4f} | "
                 f"acc@1 {acc1.item():.3f} | cos(+) {cos_pos.item():.3f} | cos(-) {cos_neg.item():.3f} | ln(B) {base_ln:.3f}"
             )
+            
+            # Log to wandb
+            if wandb_run:
+                wandb.log({
+                    "step": step,
+                    "train/total_loss": loss.item(),
+                    "train/L_con": logs['L_con'].item(),
+                    "train/L_con_m": logs.get('L_con_m', 0.0),
+                    "train/L_map": logs['L_map'].item(),
+                    "train/L_dec": L_dec.item(),
+                    "train/L_fwd": L_fwd.item(),
+                    "train/acc@1": acc1.item(),
+                    "train/cos_pos": cos_pos.item(),
+                    "train/cos_neg": cos_neg.item(),
+                    "train/ln_baseline": base_ln,
+                    "train/lr": opt.param_groups[0]['lr']
+                })
 
     print("[done] demo training complete.")
+    
+    # Finish wandb run
+    if wandb_run:
+        wandb.finish()
 
 
 # ================================================================
@@ -409,6 +328,12 @@ def import_from_path(path: str):
 def train_real(args):
     device = torch.device("cuda" if torch.cuda.is_available() and not args.cpu else "cpu")
     set_seed(args.seed)
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
+    
+    # Initialize wandb
+    wandb_run = wandb.init(project="SpecBridge")
+
 
     # Dataset (fold-aware)
     folds = None
@@ -422,46 +347,72 @@ def train_real(args):
     formula_vocab = args.formula_vocab if args.formula_vocab is not None else max(2, getattr(ds, "_formula_vocab", 0) or 32)
     adduct_vocab  = args.adduct_vocab  if args.adduct_vocab  is not None else max(2, getattr(ds, "_adduct_vocab", 0) or 16)
     charge_vocab  = args.charge_vocab  if args.charge_vocab  is not None else max(2, getattr(ds, "_charge_vocab", 0) or 8)
-
+    g_train = torch.Generator(device="cpu").manual_seed(args.seed)
+    g_val   = torch.Generator(device="cpu").manual_seed(0)
     # Val split (same vocabs as train; no shuffling)
     ds_val = MassSpecGymDataset(args.mgf, args.meta_json, folds={'val'})
     collate_val = lambda b: collate_massspecgym(
         b, args.spec_bins, formula_vocab, adduct_vocab, charge_vocab, args.fp_bits, seed=args.seed
     )
-    dl_val = torch.utils.data.DataLoader(ds_val, batch_size=args.batch_size, shuffle=False,
-                        num_workers=args.num_workers, pin_memory=args.pin_memory,
-                        persistent_workers=False, collate_fn=collate_val)
+
+    dl_val = torch.utils.data.DataLoader(
+        ds_val, batch_size=args.batch_size, shuffle=False,
+        num_workers=args.num_workers, pin_memory=args.pin_memory,
+        persistent_workers=False, collate_fn=collate_val,
+        worker_init_fn=seed_worker, generator=g_val,
+    )
+
+
+
 
     # Batching with K replicates per identity
-    # sampler = BalancedBatchSampler(ds._records, batch_size=args.batch_size, K=args.K, shuffle=True)
+    sampler = BalancedBatchSampler(ds._records, batch_size=args.batch_size, K=args.K, shuffle=True)
     
 
-    sampler = ReplicateBatchSampler(ds._records, args.batch_size, K=args.supcon_k, seed=args.seed)
+    # sampler = ReplicateBatchSampler(ds._records, args.batch_size, K=args.supcon_k, seed=args.seed)
 
     loader = torch.utils.data.DataLoader(
         ds,
-        batch_sampler=sampler,
+        batch_size=args.batch_size,
+        shuffle=True,
+        # batch_sampler=sampler,
         collate_fn=lambda b: collate_massspecgym(
             b, args.spec_bins, formula_vocab, adduct_vocab, charge_vocab, args.fp_bits, seed=args.seed
         ),
         num_workers=args.num_workers,
         pin_memory=args.pin_memory,
         persistent_workers=(args.num_workers > 0 and args.persistent_workers),
+        worker_init_fn=seed_worker, generator=g_train,
     )
 
+
+
         # Models
-    dreams_backbone = load_dreams_encoder(args.dreams_ckpt, d_in=args.spec_bins, d_out=1024)
-    mol_encoder = MolEncoder(d_in=args.fp_bits, embed_dim=512)
+    # Random init for spec encoder (ablation study)
+    init_spec_from_scratch = getattr(args, "init_spec_from_scratch", False)
+    dreams_backbone = load_dreams_encoder(
+        args.dreams_ckpt, 
+        d_in=args.spec_bins, 
+        d_out=1024, 
+        init_from_scratch=init_spec_from_scratch
+    )
+    
+    # If spec encoder is randomly initialized, don't freeze it
+    freeze_spec_backbone = not init_spec_from_scratch
+
+    # Random init for mol encoder (ablation study)
+    init_mol_from_scratch = getattr(args, "init_mol_from_scratch", False)
 
     model = DreamsToMolCondition(
         dreams_backbone,
-        mol_encoder,
         d_out=args.cond_dim,
         mapper_hidden=args.mapper_hidden,
         gaussian=not args.no_gaussian,
         mol_space=args.mol_space,
         chemberta_model=getattr(args, "chemberta_model", None),
-        fp_bits=args.fp_bits,
+        args=args,
+        freeze_backbone=freeze_spec_backbone,
+        init_mol_from_scratch=init_mol_from_scratch
     ).to(device)
     larger = args.early_metric in {"val_acc", "val_acc1", "val_acc1_mapped"}
     stopper = EarlyStopper(patience=args.patience, min_delta=args.min_delta, larger_is_better=larger)
@@ -474,6 +425,11 @@ def train_real(args):
         "model=", next(model.parameters()).device,
         "dreams=", next(model.spec.dreams.parameters()).device,
     )
+    
+    if init_spec_from_scratch:
+        print("[ablation] Spec encoder initialized from scratch (random init) - will be trained")
+    if init_mol_from_scratch:
+        print("[ablation] Mol encoder initialized from scratch (random init) - will be trained")
     if args.freeze_mol_adapter:
         if getattr(model, "mol", None) is not None:
             for p in model.mol.parameters():
@@ -484,6 +440,11 @@ def train_real(args):
             
     if args.unfreeze_last > 0 and args.unfreeze_after == 0:
         model.spec.unfreeze_last(n_layers=args.unfreeze_last)
+        print(f"[adapter] unfroze last {args.unfreeze_last} layer(s) of DreaMS (immediate)")
+    
+    if args.unfreeze_mol_last > 0 and args.unfreeze_mol_after == 0:
+        model.unfreeze_mol_last(n_layers=args.unfreeze_mol_last)
+        print(f"[adapter] unfroze last {args.unfreeze_mol_last} layer(s) of molecule encoder (immediate)")
 
     # Decoder/predictor (optional, default to Toy*)
     if args.decoder_import:
@@ -533,7 +494,9 @@ def train_real(args):
     opt = torch.optim.AdamW(params, lr=args.lr, weight_decay=1e-4)
 
     # warmup + cosine
+    # total_steps = args.epochs * math.ceil(len(ds) / args.batch_size)
     total_steps = args.epochs * len(loader)
+    print(total_steps)
     warmup = int(0.05 * total_steps)  # ~5%
     def lr_lambda(it):
         if it < warmup:
@@ -544,9 +507,15 @@ def train_real(args):
     step = start_step
     for epoch in range(args.epochs):
         for batch in loader:
-            if args.unfreeze_last > 0 and args.unfreeze_after and step == args.unfreeze_after:
+            if args.unfreeze_last > 0 and step == args.unfreeze_after:
                 model.spec.unfreeze_last(n_layers=args.unfreeze_last)
                 print(f"[adapter] unfroze last {args.unfreeze_last} layer(s) of DreaMS at step {step}")
+            
+            if args.unfreeze_mol_last > 0 and step == args.unfreeze_mol_after:
+                model.unfreeze_mol_last(n_layers=args.unfreeze_mol_last)
+                print(f"[adapter] unfroze last {args.unfreeze_mol_last} layer(s) of molecule encoder at step {step}")
+                # Note: If unfreezing during training, the optimizer won't include these parameters
+                # unless it's recreated. For best results, use --unfreeze-mol-after 0 for immediate unfreezing.
 
             step += 1
             s = batch['spectra'].to(device, non_blocking=True)
@@ -590,19 +559,21 @@ def train_real(args):
                 )
 
                 # Optional decoding/predictive losses
-                cond = mix_condition(z_m, z_hat, p=0.5, training=True)
-                dec_out = decoder(gt_graph, cond=cond, formula=meta["formula"], adduct=meta["adduct"], charge=meta["charge"])
-                L_dec = dec_out["loss"]
-                s_pred = spec_pred(dec_out["graph"], meta)
-                L_fwd = fwd_loss(s_pred, s)
-                keys_in_batch = torch.arange(z_s.size(0), device=z_s.device)
-                hard_lists = _topk_hard_neg_indices(batch["mol_feats"].to(z_s.device), topk=getattr(args, "hard_topk", 8))
+                # cond = mix_condition(z_m, z_hat, p=0.5, training=True)
+                # dec_out = decoder(gt_graph, cond=cond, formula=meta["formula"], adduct=meta["adduct"], charge=meta["charge"])
+                # L_dec = dec_out["loss"]
+                # s_pred = spec_pred(dec_out["graph"], meta)
+                # L_fwd = fwd_loss(s_pred, s)
+                # keys_in_batch = torch.arange(z_s.size(0), device=z_s.device)
+                # hard_lists = _topk_hard_neg_indices(batch["mol_feats"].to(z_s.device), topk=getattr(args, "hard_topk", 8))
 
-                L_hard = hard_inbatch_nce(mu_s, z_m, keys_in_batch, hard_lists, temperature=getattr(args, "hard_temp", 0.07))
+                # L_hard = hard_inbatch_nce(mu_s, z_m, keys_in_batch, hard_lists, temperature=getattr(args, "hard_temp", 0.07))
 
                 # 3) Add it with a weight
-                logs["L_hard"] = L_hard.detach()
-                loss = L_align + args.w_dec * L_dec + args.w_fwd * L_fwd + args.w_hard * L_hard
+                # logs["L_hard"] = L_hard.detach()
+                # loss = L_align + args.w_dec * L_dec + args.w_fwd * L_fwd + args.w_hard * L_hard
+                loss = L_align 
+
                 # if not args.no_gaussian:
                 #     z_samp = model.mapB.sample(mu_s, lv_s, deterministic=False)
                 #     L_sample = 1.0 - F.cosine_similarity(F.normalize(z_samp, -1), F.normalize(z_m, -1)).mean()
@@ -613,9 +584,8 @@ def train_real(args):
             if not torch.isfinite(loss):
                 print(
                     f"step {step:05d} | total {loss.item():.4f} | "
-                    f"L_con {logs['L_con'].item():.4f} | L_con_m {logs['L_con_m'].item():.4f} | "
-                    f"L_map {logs['L_map'].item():.4f} | L_sup {logs['L_sup'].item():.4f} | L_ortho {logs['L_ortho'].item():.6f} | L_hard {logs['L_hard'].item():.6f} |"
-                    f"L_dec {L_dec.item():.4f} | L_fwd {L_fwd.item():.4f} | "
+                    f"L_con_m {logs['L_con_m'].item():.4f} | "
+                    f"L_map {logs['L_map'].item():.4f} | L_ortho {logs['L_ortho'].item():.6f} | "
                     f"acc@1 {acc1.item():.3f} | cos(+) {cos_pos.item():.3f} | cos(-) {cos_neg.item():.3f} | ln(B) {base_ln:.3f}"
                 )
                 opt.zero_grad(set_to_none=True)
@@ -635,16 +605,33 @@ def train_real(args):
 
 
             if step % args.log_every == 0:
-                acc1, cos_pos, cos_neg = _inbatch_diag_metrics(z_s, z_m)
+                acc1, cos_pos, cos_neg = _inbatch_diag_metrics(mu_s, z_m)
                 print(
                     f"step {step:05d} | total {loss.item():.4f} | "
-                    f"L_con {logs['L_con'].item():.4f} | L_con_m {logs['L_con_m'].item():.4f} | "
-                    f"L_map {logs['L_map'].item():.4f} | L_sup {logs['L_sup'].item():.4f} | L_ortho {logs['L_ortho'].item():.6f} | L_hard {logs['L_hard'].item():.6f} | "
-                    f"L_dec {L_dec.item():.4f} | L_fwd {L_fwd.item():.4f} | "
+                    f"L_con_m {logs['L_con_m'].item():.4f} | "
+                    f"L_map {logs['L_map'].item():.4f} | L_ortho {logs['L_ortho'].item():.6f} | "
                     f"acc@1 {acc1.item():.3f} | cos(+) {cos_pos.item():.3f} | cos(-) {cos_neg.item():.3f} | ln(B) {base_ln:.3f}"
                 )
+                
+                # Log to wandb
+                if wandb_run:
+                    wandb.log({
+                        "step": step,
+                        "train/total_loss": loss.item(),
+                        "train/L_con_m": logs['L_con_m'].item(),
+                        "train/L_map": logs['L_map'].item(),
+                        "train/L_ortho": logs['L_ortho'].item(),
+                        "train/L_sup": logs.get('L_sup', 0.0),
+                        "train/acc@1": acc1.item(),
+                        "train/cos_pos": cos_pos.item(),
+                        "train/cos_neg": cos_neg.item(),
+                        "train/ln_baseline": base_ln,
+                        "train/lr": opt.param_groups[0]['lr']
+                    })
             if args.early_stop and (step % args.val_every == 0):
-                val_metrics, acc_val = run_val(model, dl_val, args)
+                with preserve_rng(), torch.inference_mode():
+                    val_metrics, acc_val = run_val(model, dl_val, args)
+                
                 metric_key = args.early_metric       # e.g., 'val_total'
                 if metric_key == 'val_acc':
                     current = acc_val
@@ -654,14 +641,46 @@ def train_real(args):
                 print(f"[val] step {step} | {metric_key}={current:.4f} | "
                     f"{'IMPROVED' if improved else f'no-improve ({stopper.bad}/{args.patience})'}")
 
+                # Log validation metrics to wandb
+                if wandb_run:
+                    val_log = {
+                        "step": step,
+                        f"val/{metric_key}": current,
+                        "val/acc_val": acc_val,
+                        "val/patience": stopper.bad,
+                        "val/improved": improved
+                    }
+                    # Add all validation metrics
+                    for k, v in val_metrics.items():
+                        val_log[f"val/{k}"] = v
+                    wandb.log(val_log)
+
                 if improved:
-                    torch.save({'model': model.state_dict(), 'args': vars(args), 'step': step},
-                            best_ckpt_path)
+                    checkpoint_data = {
+                        "model": model.state_dict(),
+                        "decoder": decoder.state_dict(),
+                        "spec_pred": spec_pred.state_dict(),
+                        "opt": opt.state_dict(),
+                        "step": step,
+                        "args": vars(args),
+                    }
+                    torch.save(checkpoint_data, best_ckpt_path)
+                    
+                    # # Log best checkpoint to wandb
+                    # if wandb_run:
+                    #     artifact = wandb.Artifact(
+                    #         name=f"best_model_step_{step}",
+                    #         type="model",
+                    #         description=f"Best model checkpoint at step {step} with {metric_key}={current:.4f}"
+                    #     )
+                    #     artifact.add_file(best_ckpt_path)
+                    #     wandb.log_artifact(artifact)
+                    
                     exits = False
 
                 if stopper.should_stop():
                     print(f"[early-stop] patience exhausted at step {step}. "
-                        f"Best {metric_key} so far={(-stopper.best if args.early_metric.startswith('val_') else stopper.best):.4f}")
+                        f"Best {metric_key} so far={(stopper.best if args.early_metric.startswith('val_') else stopper.best):.4f}")
                     exits = True
                     break
 
@@ -670,21 +689,49 @@ def train_real(args):
 
 
             if args.save_every and step % args.save_every == 0:
-                torch.save({
+                checkpoint_path = os.path.join(args.outdir, f"ckpt_{step:06d}.pt")
+                checkpoint_data = {
                     "model": model.state_dict(),
                     "decoder": decoder.state_dict(),
                     "spec_pred": spec_pred.state_dict(),
                     "opt": opt.state_dict(),
                     "step": step,
                     "args": vars(args),
-                }, os.path.join(args.outdir, f"ckpt_{step:06d}.pt"))
+                }
+                torch.save(checkpoint_data, checkpoint_path)
+                
+                # Log periodic checkpoint to wandb
+                # if wandb_run:
+                #     artifact = wandb.Artifact(
+                #         name=f"checkpoint_step_{step:06d}",
+                #         type="model",
+                #         description=f"Periodic checkpoint at step {step}"
+                #     )
+                #     artifact.add_file(checkpoint_path)
+                #     wandb.log_artifact(artifact)
 
             if args.max_steps and step >= args.max_steps:
                 print("[done] real training reached max steps.")
                 return
-        if exits:
+        if args.early_stop and exits:
+            print(f"[early-stop] patience exhausted at step {step}. ")
             break
+    checkpoint_path = os.path.join(args.outdir, f"last.pt")
+    checkpoint_data = {
+        "model": model.state_dict(),
+        "decoder": decoder.state_dict(),
+        "spec_pred": spec_pred.state_dict(),
+        "opt": opt.state_dict(),
+        "step": step,
+        "args": vars(args),
+    }
+    torch.save(checkpoint_data, checkpoint_path)
+
     print("[done] real training complete.")
+    
+    # Finish wandb run
+    if wandb_run:
+        wandb.finish()
 
 
 # ================================================================
@@ -696,6 +743,8 @@ if __name__ == "__main__":
     p.add_argument("--demo", action="store_true", help="run synthetic training demo")
     p.add_argument("--cpu", action="store_true", help="force CPU")
     p.add_argument("--dreams-ckpt", type=str, default=None, help="path to real DreaMS checkpoint (optional)")
+    p.add_argument("--init-spec-from-scratch", action="store_true", help="Initialize spec encoder from scratch (random init) for ablation study")
+    p.add_argument("--init-mol-from-scratch", action="store_true", help="Initialize mol encoder from scratch (random init) for ablation study")
     p.add_argument("--spec-bins", type=int, default=2048, help="spectral bins for binned spectra representation")
     p.add_argument("--fp-bits", type=int, default=2048, help="fingerprint bits (Morgan)")
     p.add_argument("--cond-dim", type=int, default=512, help="conditioning embedding dim")
@@ -714,9 +763,11 @@ if __name__ == "__main__":
     p.add_argument("--formula-vocab", type=int, default=None, help="Override formula one-hot size")
     p.add_argument("--adduct-vocab", type=int, default=None, help="Override adduct one-hot size")
     p.add_argument("--charge-vocab", type=int, default=None, help="Override charge one-hot size")
-    p.add_argument("--epochs", type=int, default=1, help="Epochs for real training")
+    p.add_argument("--epochs", type=int, default=5, help="Epochs for real training")
     p.add_argument("--max-steps", type=int, default=None, help="Optional max steps cutoff for real training")
     p.add_argument("--unfreeze-last", type=int, default=0, help="Unfreeze last N layers in DreaMS backbone")
+    p.add_argument("--unfreeze-mol-last", type=int, default=0, help="Unfreeze last N layers in molecule encoder (ChemBERTa)")
+    p.add_argument("--unfreeze-mol-after", type=int, default=0, help="Unfreeze molecule encoder after N steps (0=immediate/no-op)")
     p.add_argument("--decoder-import", type=str, default=None, help="Optional 'module:Class' for your diffusion decoder")
     p.add_argument("--predictor-import", type=str, default=None, help="Optional 'module:Class' for your spectrum predictor")
     p.add_argument("--num-workers", type=int, default=0, help="DataLoader workers; 0 avoids CUDA/fork issues")
@@ -760,6 +811,15 @@ if __name__ == "__main__":
     p.add_argument('--min-delta', type=float, default=0.0, help='required improvement (absolute) to reset patience')
     p.add_argument('--early-metric', choices=['val_total','val_L_con_m','val_L_con','val_sup', 'val_acc'],
                     default='val_acc', help='which val metric to monitor (smaller is better)')
+    p.add_argument(
+        "--chem-model-type",
+        choices=["auto", "bert", "t5"],
+        default="auto",
+        help="Family for --mol-space=chemberta models. 'auto' infers from config; "
+            "'bert' forces [CLS]/pooled; 't5' uses encoder-only T5 with mean pooling."
+    )
+
+    p.add_argument("--no-wandb", action="store_true", help="Disable wandb logging")
 
 
     args = p.parse_args()

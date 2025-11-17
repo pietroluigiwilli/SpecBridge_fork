@@ -47,3 +47,53 @@ specbridge \
 python specbridge_entry.py --demo --steps 200
 ```
 
+python dreams_condition_adapter.py \
+  --mgf /cluster/tufts/liulab/yiwan01/SpecBridge/data/MassSpecGym.mgf \
+  --dreams-ckpt /cluster/tufts/liulab/yiwan01/SpecBridge/data/ssl_model.ckpt \
+  --fold train \
+  --batch-size 128 --epochs 10 \
+  --cond-dim 2048 --mapper-hidden 2048 \
+  --no-gaussian \
+  --supcon-k 4 \
+  --w-con 0 --w-con-mapped 0 --w-map 5.0 --w-ortho 1e-3 \
+  --w-supcon 1.0 --supcon-temp 0.07 \
+  --w-hard 0.0 --hard-topk 16 --hard-temp 0.07 \
+  --train-candidates /cluster/tufts/liulab/yiwan01/massspecgym/cand_dict_large_form.pkl \
+  --w-iso 0.5 --iso-k 8 --iso-temp 0.07 \
+  --log-every 50 --save-every 200 \
+  --outdir runs/specbridge_align_chemberta_pub_v3e \
+  --mol-space chemberta --chemberta-model Derify/ChemBERTa_augmented_pubchem_13m
+
+
+
+  python -m specbridge.eval.candidates \
+    --mgf /cluster/tufts/liulab/yiwan01/SpecBridge/data/MassSpecGym.mgf \
+    --dreams-ckpt /cluster/tufts/liulab/yiwan01/SpecBridge/data/ssl_model.ckpt \
+    --adapter-ckpt runs/specbridge_align_chemberta_v4/ckpt_007000.pt \
+    --candidates /cluster/tufts/liulab/yiwan01/massspecgym/cand_dict_large_form.pkl \
+    --fold-query test --use-mapped --deterministic-map \
+    --batch-size 32 \
+    --cond-dim 2048 --mapper-hidden 2048 \
+    --mol-space chemberta --chemberta-model seyonec/ChemBERTa-zinc-base-v1 \
+    --cache-cand-emb /cluster/tufts/liulab/yiwan01/SpecBridge/cache/cands_test_chemberta_all.pt
+
+
+
+
+python -m specbridge.eval.candidates     --mgf /cluster/tufts/liulab/yiwan01/SpecBridge/data/MassSpecGym.mgf     --dreams-ckpt /cluster/tufts/liulab/yiwan01/SpecBridge/data/ssl_model.ckpt     --adapter-ckpt runs/specbridge_align_chemberta_v3b/ckpt_007000.pt     --candidates /cluster/tufts/liulab/yiwan01/massspecgym/cand_dict_large_form.pkl --fold-query test --use-mapped --deterministic-map     --batch-size 32     --cond-dim 2048 --mapper-hidden 2048     --mol-space chemberta --chemberta-model seyonec/ChemBERTa-zinc-base-v1 --no-gaussian
+
+
+
+python -m specbridge.eval.candidates     --mgf /cluster/tufts/liulab/yiwan01/SpecBridge/data/MassSpecGym.mgf     --dreams-ckpt /cluster/tufts/liulab/yiwan01/SpecBridge/data/ssl_model.ckpt     --adapter-ckpt runs/specbridge_align_chemberta_pub_v3d/ckpt_000600.pt    --candidates /cluster/tufts/liulab/yiwan01/massspecgym/cand_dict_large_form.pkl --fold-query test --use-mapped --deterministic-map --no-gaussian     --batch-size 32     --cond-dim 2048 --mapper-hidden 2048     --mol-space chemberta --chemberta-model Derify/ChemBERTa_augmented_pubchem_13m
+
+python -m specbridge.usecases.molgpt_from_spec \
+  --mgf /cluster/tufts/liulab/yiwan01/SpecBridge/data/MassSpecGym.mgf \
+  --dreams-ckpt /cluster/tufts/liulab/yiwan01/SpecBridge/data/ssl_model.ckpt \
+  --adapter-ckpt /cluster/tufts/liulab/yiwan01/SpecBridge/runs/specbridge_align_chemberta_pub_v3f/ckpt_001400.pt \
+  --cond-dim 2048 --mapper-hidden 2048 --no-gaussian \
+  --chemberta-model Derify/ChemBERTa_augmented_pubchem_13m \
+  --molgpt-ckpt /cluster/tufts/liulab/yiwan01/molgpt/cond_gpt/weights/pub_13M.pt \
+  --fold-query test \
+  --samples-per-spec 64 --max-new-tokens 128 --temperature 0.8 --top-k 10 \
+  --out-csv runs/molgpt_gen_from_spec.csv
+

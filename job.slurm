@@ -27,6 +27,6 @@ python dreams_condition_adapter.py \
   --outdir runs/specbridge_align_chemberta_v4 \
   --mol-space chemberta \
   --chemberta-model seyonec/ChemBERTa-zinc-base-v1 \
-  --val-every 200  \
+  --val-every 1000  \
   --early-stop \
   --patience 50
