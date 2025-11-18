@@ -414,6 +414,14 @@ def train_real(args):
         freeze_backbone=freeze_spec_backbone,
         init_mol_from_scratch=init_mol_from_scratch
     ).to(device)
+    
+    # Ensure ff_out and other task-specific heads are removed from DreaMS backbone
+    # This matches what happens when loading from pretrained checkpoint
+    # and ensures they're not included in optimizer or saved in checkpoints
+    if hasattr(model.spec.dreams, 'ff_out') or hasattr(model.spec.dreams, 'mz_masking_loss') or hasattr(model.spec.dreams, 'ro_out'):
+        from dreams.api import PreTrainedModel  # type: ignore
+        model.spec.dreams = PreTrainedModel.remove_unused_backbone_parameters(model.spec.dreams)
+        print("[training] Removed task-specific heads (ff_out, etc.) from DreaMS backbone to match pretrained architecture")
     larger = args.early_metric in {"val_acc", "val_acc1", "val_acc1_mapped"}
     stopper = EarlyStopper(patience=args.patience, min_delta=args.min_delta, larger_is_better=larger)
     best_ckpt_path = os.path.join(args.outdir, "best_val.pt")

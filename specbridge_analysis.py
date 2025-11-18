@@ -178,7 +178,7 @@ def _compute_cache_key(args) -> str:
 
 def _save_cache(cache_dir: str, cache_key: str, cand_z, true_z, recs,
                 umap_pairs, umap_ok, umap_adducts, umap_charges, umap_margins,
-                dreams_embeds, mapped_embeds, mol_embeds, labels):
+                dreams_embeds, mapped_embeds, mol_embeds, labels, cos_target=None, cos_candidates_mean=None):
     os.makedirs(cache_dir, exist_ok=True)
     cache_file = os.path.join(cache_dir, f"cache_{cache_key}.pkl")
     payload = dict(
@@ -189,6 +189,8 @@ def _save_cache(cache_dir: str, cache_key: str, cand_z, true_z, recs,
         dreams_embeds=np.asarray(dreams_embeds), mapped_embeds=np.asarray(mapped_embeds),
         mol_embeds=np.asarray(mol_embeds) if mol_embeds and len(mol_embeds) > 0 else None,
         labels=labels,
+        cos_target=cos_target if cos_target else None,
+        cos_candidates_mean=cos_candidates_mean if cos_candidates_mean else None,
     )
     with open(cache_file, "wb") as f:
         pickle.dump(payload, f)
@@ -206,6 +208,8 @@ def _load_cache(cache_dir: str, cache_key: str):
         mapped_embeds = X.get("mapped_embeds", None)
         mol_embeds = X.get("mol_embeds", None)
         labels = X.get("labels", None)
+        cos_target = X.get("cos_target", None)
+        cos_candidates_mean = X.get("cos_candidates_mean", None)
         
         # Convert numpy arrays to lists for consistency
         if dreams_embeds is not None and isinstance(dreams_embeds, np.ndarray):
@@ -214,10 +218,18 @@ def _load_cache(cache_dir: str, cache_key: str):
             mapped_embeds = mapped_embeds.tolist()
         if mol_embeds is not None and isinstance(mol_embeds, np.ndarray):
             mol_embeds = mol_embeds.tolist()
+        if cos_target is not None and isinstance(cos_target, np.ndarray):
+            cos_target = cos_target.tolist()
+        elif cos_target is not None and isinstance(cos_target, list):
+            cos_target = cos_target
+        if cos_candidates_mean is not None and isinstance(cos_candidates_mean, np.ndarray):
+            cos_candidates_mean = cos_candidates_mean.tolist()
+        elif cos_candidates_mean is not None and isinstance(cos_candidates_mean, list):
+            cos_candidates_mean = cos_candidates_mean
         
         return (cand_z, true_z, X["recs"], X["umap_pairs"], X["umap_ok"],
                 X.get("umap_adducts", []), X.get("umap_charges", []), X.get("umap_margins", []),
-                dreams_embeds, mapped_embeds, mol_embeds, labels)
+                dreams_embeds, mapped_embeds, mol_embeds, labels, cos_target, cos_candidates_mean)
     except Exception as e:
         warnings.warn(f"[Cache] Failed to load: {e}")
         return None
@@ -433,11 +445,20 @@ def main():
     cos_candidates_mean: List[float] = []
     
     if cached is not None:
-        (cand_z, true_z, recs, umap_pairs, umap_ok,
-         umap_adducts, umap_charges, umap_margins,
-         dreams_embeds, mapped_embeds, mol_embeds, labels) = cached
+        cached_vals = cached
+        if len(cached_vals) >= 14:
+            (cand_z, true_z, recs, umap_pairs, umap_ok,
+             umap_adducts, umap_charges, umap_margins,
+             dreams_embeds, mapped_embeds, mol_embeds, labels, 
+             cos_target, cos_candidates_mean) = cached_vals
+        else:
+            # Old cache format without cos_target/cos_candidates_mean
+            (cand_z, true_z, recs, umap_pairs, umap_ok,
+             umap_adducts, umap_charges, umap_margins,
+             dreams_embeds, mapped_embeds, mol_embeds, labels) = cached_vals
+            cos_target = []
+            cos_candidates_mean = []
         print("[Cache] Using cached results")
-        # Note: cos_target and cos_candidates_mean not available from cache, will be empty
     else:
         # Build model + embed fn
         model = build_model(args, device)
@@ -559,14 +580,12 @@ def main():
                 sims_np = sims.detach().float().cpu().numpy()
                 order = torch.argsort(sims, descending=True)
                 
-                # Collect mean cosine similarity with all candidates
-                cos_candidates_mean.append(float(np.mean(sims_np)))
-
                 rank_true = None
                 cos_true  = None
                 margin    = None
                 angle_deg = None
                 correct   = 0
+                cos_target_val = None
 
                 # Compute cosine similarity with target molecule (for histogram)
                 if true_smi in kept:
@@ -576,8 +595,7 @@ def main():
                         rank_true = int(pos.item())
                         correct = int(rank_true == 0)
                     cos_true = float(sims[idx_true].item())
-                    # Collect cosine similarity with target molecule
-                    cos_target.append(cos_true)
+                    cos_target_val = cos_true
                     if C >= 2:
                         mask = torch.ones(C, dtype=torch.bool, device=sims.device)
                         mask[idx_true] = False
@@ -597,34 +615,35 @@ def main():
                         else:
                             zqi_target = _l2norm(z_query[i].to(device), dim=-1)
                             cos_target_val = float((zqi_target @ z_target).item())
-                        cos_target.append(cos_target_val)
-                    else:
-                        # If target embedding not available, skip this query for histogram
-                        # (but still process for other metrics)
-                        pass
+                
+                # Only collect both values if we have target similarity (for aligned histogram)
+                if cos_target_val is not None:
+                    cos_target.append(cos_target_val)
+                    # Collect mean cosine similarity with all candidates (for same query)
+                    cos_candidates_mean.append(float(np.mean(sims_np)))
 
-                    # UMAP stash (mapped vs true)
-                    if args.umap and (true_smi in true_z):
-                        # zqi_rank is [K,D] when z_query.dim()==3, else [D]
-                        zhat = _l2norm(zqi_rank.mean(0) if z_query.dim() == 3 else zqi_rank, dim=-1)
-                        zhat = zhat.detach().cpu().numpy()
-                        ytru = _l2norm(true_z[true_smi], dim=-1).detach().cpu().numpy()
-                        # Ensure both are 1D arrays with same shape
-                        if zhat.ndim == 0:
-                            zhat = zhat.reshape(1)
-                        if ytru.ndim == 0:
-                            ytru = ytru.reshape(1)
-                        if zhat.shape != ytru.shape:
-                            # If shapes still don't match, ensure both are flattened to 1D
-                            zhat = zhat.flatten()
-                            ytru = ytru.flatten()
-                        umap_pairs.append(np.stack([zhat, ytru], axis=0))
-                        umap_ok.append(correct)
-                        umap_margins.append(margin if margin is not None else np.nan)
-                        # meta
-                        adduct = str(meta.get("adduct", "unknown"))
-                        charge = int(meta.get("charge", 0)) if isinstance(meta.get("charge", 0), (int, np.integer)) else 0
-                        umap_adducts.append(adduct); umap_charges.append(charge)
+                # UMAP stash (mapped vs true)
+                if args.umap and (true_smi in true_z):
+                    # zqi_rank is [K,D] when z_query.dim()==3, else [D]
+                    zhat = _l2norm(zqi_rank.mean(0) if z_query.dim() == 3 else zqi_rank, dim=-1)
+                    zhat = zhat.detach().cpu().numpy()
+                    ytru = _l2norm(true_z[true_smi], dim=-1).detach().cpu().numpy()
+                    # Ensure both are 1D arrays with same shape
+                    if zhat.ndim == 0:
+                        zhat = zhat.reshape(1)
+                    if ytru.ndim == 0:
+                        ytru = ytru.reshape(1)
+                    if zhat.shape != ytru.shape:
+                        # If shapes still don't match, ensure both are flattened to 1D
+                        zhat = zhat.flatten()
+                        ytru = ytru.flatten()
+                    umap_pairs.append(np.stack([zhat, ytru], axis=0))
+                    umap_ok.append(correct)
+                    umap_margins.append(margin if margin is not None else np.nan)
+                    # meta
+                    adduct = str(meta.get("adduct", "unknown"))
+                    charge = int(meta.get("charge", 0)) if isinstance(meta.get("charge", 0), (int, np.integer)) else 0
+                    umap_adducts.append(adduct); umap_charges.append(charge)
 
                 # ECFP/Tanimoto in-candidate diagnostics
                 pearson = spearman = sa5 = sa10 = sa20 = np.nan
@@ -661,7 +680,8 @@ def main():
         if cache_key and not args.no_cache:
             _save_cache(cache_dir, cache_key, cand_z, true_z, recs, umap_pairs, umap_ok,
                         umap_adducts, umap_charges, umap_margins,
-                        dreams_embeds, mapped_embeds, mol_embeds, labels)
+                        dreams_embeds, mapped_embeds, mol_embeds, labels,
+                        cos_target, cos_candidates_mean)
 
     # Save per-query CSV
     df = pd.DataFrame([asdict(r) for r in recs])
@@ -703,13 +723,14 @@ def main():
         if len(cos_target_aligned) > 0:
             plt.figure(figsize=(3.35, 2.6), dpi=300)
             bins = np.linspace(min(min(cos_target_aligned), min(cos_candidates_mean_aligned)) - 0.1, 
-                              max(max(cos_target_aligned), max(cos_candidates_mean_aligned)) + 0.1, 50)
-            plt.hist(cos_target_aligned, bins=bins, alpha=0.7, color=BLUE, 
-                    edgecolor="white", linewidth=0.3, label="Spectrum and target molecules", density=False)
-            plt.hist(cos_candidates_mean_aligned, bins=bins, alpha=0.7, color=ORANGE, 
-                    edgecolor="white", linewidth=0.3, label="Mean cosine sim - spectrum and candidates", density=False)
+                              max(max(cos_target_aligned), max(cos_candidates_mean_aligned)) + 0.1, 10000)
+            plt.hist(cos_target_aligned, bins=bins, alpha=0.6, color=BLUE, 
+                    edgecolor="white", linewidth=0.003, label="Spectrum and target molecules", density=False)
+            plt.hist(cos_candidates_mean_aligned, bins=bins, alpha=0.6, color=ORANGE, 
+                    edgecolor="white", linewidth=0.003, label="Mean cosine sim - spectrum and candidates", density=False)
             plt.xlabel("Cosine similarity")
             plt.ylabel("Counts")
+            plt.xlim(0.997, 1.0)  # Zoom in on high similarity region
             plt.legend(frameon=False, loc="best", fontsize=7)
             plt.grid(axis="y", alpha=0.3)
             plt.title("Distribution of cosine similarities")

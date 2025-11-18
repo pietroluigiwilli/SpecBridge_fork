@@ -22,7 +22,8 @@ class DummyDreams(nn.Module):
 def _create_default_dreams_args(n_highest_peaks: int = 60):
     """Create default arguments for DreaMS model initialization.
     
-    Default values are based on the DreaMS pre-training configuration.
+    Default values are based on the DreaMS pre-training configuration (ssl_model.ckpt).
+    These match the architecture used in the pretrained checkpoint.
     """
     from dreams.utils.dformats import DataFormatA  # type: ignore
     
@@ -53,7 +54,7 @@ def _create_default_dreams_args(n_highest_peaks: int = 60):
         cos_reg_alpha=0.0,
         cos_reg_reduction=None,
         mask_val=-1.0,
-        fourier_num_freqs=512,  # Not used with lin_float_int but required parameter
+        fourier_num_freqs=None,  # Matches ssl_model.ckpt (None for lin_float_int)
         fourier_trainable=False,
         fourier_min_freq=None,
         dropout=0.1,
@@ -105,6 +106,14 @@ def load_dreams_encoder(dreams_ckpt: Optional[str] = None, d_in: int = 2048, d_o
             model = DreaMSModel(args, spec_preproc)
             # Set embed_dim for compatibility with DreamsAdapter
             model.embed_dim = model.d_model
+            
+            # Remove task-specific heads to match pretrained checkpoint architecture
+            # This ensures consistency: when loading from checkpoint, PreTrainedModel.from_ckpt()
+            # calls remove_unused_backbone_parameters() which removes these heads.
+            # We use the same function here so from-scratch and from-checkpoint have identical architectures.
+            from dreams.api import PreTrainedModel  # type: ignore
+            model = PreTrainedModel.remove_unused_backbone_parameters(model)
+            
             print(f"Initialized DreaMS model from scratch (n_highest_peaks={n_highest_peaks}, embed_dim={model.embed_dim})")
             return model
         except Exception as e:

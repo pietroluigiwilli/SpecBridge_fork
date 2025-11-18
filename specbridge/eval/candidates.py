@@ -354,13 +354,22 @@ def main():
         ck = _canon_smi(k) or k.strip()
         vals = []
         
-        random.shuffle(vs)
+        # Add all candidates first
         for v in vs:
             if not v:
                 continue
             cv = _canon_smi(v) or v.strip()
             vals.append(cv)
-        vals.append(ck)
+        
+        # Ensure true SMILES is in the candidate list (for evaluation)
+        # This is necessary to compute ranks, but we'll randomize position
+        if ck not in vals:
+            vals.append(ck)
+        
+        # Shuffle to randomize position of true SMILES (avoids positional bias)
+        # Note: This is safe because ranking is based on similarity, not position
+        random.shuffle(vals)
+        
         cand_map[ck] = list(dict.fromkeys(vals))  # unique, preserve order
         
         
