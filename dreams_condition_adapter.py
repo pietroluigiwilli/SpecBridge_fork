@@ -373,9 +373,9 @@ def train_real(args):
 
     loader = torch.utils.data.DataLoader(
         ds,
-        batch_size=args.batch_size,
-        shuffle=True,
-        # batch_sampler=sampler,
+        # batch_size=args.batch_size,
+        # shuffle=True,
+        batch_sampler=sampler,
         collate_fn=lambda b: collate_massspecgym(
             b, args.spec_bins, formula_vocab, adduct_vocab, charge_vocab, args.fp_bits, seed=args.seed
         ),

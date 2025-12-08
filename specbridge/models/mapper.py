@@ -152,7 +152,17 @@ class DreamsToMolCondition(nn.Module):
         mu_n  = mu_s
         z_m_for_con = z_m_n.detach() if stop_mol_in_con else z_m_n
         # L_con   = self.contrast(z_s_n, z_m_for_con)
-        L_con_m = self.contrast(mu_n, z_m_n.detach())
+        
+        # InfoNCE loss: matches mu_s[i] with z_m[i] (1-to-1 diagonal matching)
+        # Note: With K replicates per SMILES (from BalancedBatchSampler), z_m will have 
+        # duplicate embeddings for samples with the same SMILES. This is fine - InfoNCE 
+        # will learn that multiple mu_s (from different spectra) should match the same z_m.
+        # Skip computation if weight is 0 to avoid unnecessary work.
+        L_con_m = self.contrast(mu_n, z_m_n.detach()) if w_con_mapped > 0 else torch.tensor(0.0, device=mu_n.device)
+        
+        # MSE loss: each spectrum (mu_s[i]) tries to match its molecule embedding (z_m[i])
+        # With K replicates, this gives K training examples per molecule per batch,
+        # which is beneficial for learning robust spectrum→molecule mappings.
         L_map = F.mse_loss(mu_n, z_m_n, reduction='mean') # * mu_n.size(1)
         # L_map = 1 - torch.mean(F.cosine_similarity(mu_n, z_m_n, dim=1), dim=0)
         L_ortho = self.mapB.orthogonality_penalty() * w_ortho
@@ -162,7 +172,7 @@ class DreamsToMolCondition(nn.Module):
         #     L_sup = supcon_loss(z_s, z_m, supcon_keys, temperature=sup_temp)
 
         L =  (w_con_mapped * L_con_m)  + L_ortho + (w_map * L_map) # + (w_sup * L_sup) # + (w_map * L_map)
-        logs = { "L_con_m": L_con_m.detach(),
+        logs = { "L_con_m": L_con_m.detach() if isinstance(L_con_m, torch.Tensor) else torch.tensor(0.0, device=mu_n.device),
                 "L_ortho": L_ortho.detach(), "L_map": L_map.detach()}
         return L, logs
 

@@ -1,9 +1,6 @@
 from torch.utils.data import Sampler
 from collections import defaultdict
 import random
-
-from collections import defaultdict
-from torch.utils.data import Sampler
 import math
 from typing import List
 
@@ -15,30 +12,97 @@ class BalancedBatchSampler(Sampler[List[int]]):
         self.groups = defaultdict(list)
         for i, rec in enumerate(records):
             self.groups[rec["smi_key"]].append(i)
-        self.ids = [k for k, v in self.groups.items() if len(v) >= 2]
+        # Only include identities with at least K samples to ensure we can always take K
+        total_identities = len(self.groups)
+        self.ids = [k for k, v in self.groups.items() if len(v) >= K]
+        if len(self.ids) < total_identities:
+            filtered = total_identities - len(self.ids)
+            print(f"[BalancedBatchSampler] Filtered out {filtered}/{total_identities} identities with < {K} samples")
         self.batch_size = batch_size
         self.K = max(1, int(K))
+        if self.batch_size < self.K:
+            raise ValueError(f"batch_size ({batch_size}) must be >= K ({self.K})")
         self.shuffle = shuffle
+        # Pre-compute num_ids per batch for __len__
+        self.num_ids_per_batch = max(1, batch_size // self.K)
 
     def __iter__(self):
         ids = self.ids[:]
         if self.shuffle:
             random.shuffle(ids)
+        
+        # Prepare shuffled sample pools for each identity (we'll cycle through ALL samples)
+        pools = {}
+        for pid in ids:
+            g = self.groups[pid][:]  # Copy the list
+            if self.shuffle:
+                random.shuffle(g)
+            pools[pid] = g  # Store all samples, not just K
+        
         B = self.batch_size
-        num_ids = max(1, B // self.K)
-        for i in range(0, len(ids), num_ids):
-            pick = ids[i:i+num_ids]
+        num_ids = self.num_ids_per_batch
+        
+        # Track position in each identity's sample pool (for cycling)
+        positions = {pid: 0 for pid in ids}
+        
+        # Continue generating batches until we can't form a valid one
+        while True:
             batch: List[int] = []
-            for pid in pick:
-                g = self.groups[pid]
-                if self.shuffle:
-                    random.shuffle(g)
-                batch.extend(g[:self.K])
+            # Select which identities to use in this batch
+            # Shuffle identity order for diversity
+            batch_ids = ids[:]
+            if self.shuffle:
+                random.shuffle(batch_ids)
+            
+            # Fill batch with K samples from each identity (cycling through all samples)
+            for pid in batch_ids:
+                if len(batch) >= B:
+                    break
+                
+                pool = pools[pid]
+                if len(pool) == 0:
+                    continue
+                
+                pos = positions[pid]
+                samples_to_add = []
+                
+                # Take K samples starting from current position (with wrapping)
+                for _ in range(self.K):
+                    sample_idx = pool[pos % len(pool)]
+                    samples_to_add.append(sample_idx)
+                    pos = (pos + 1) % len(pool)
+                
+                # Check if we have room for all K samples
+                if len(batch) + len(samples_to_add) <= B:
+                    batch.extend(samples_to_add)
+                    positions[pid] = pos  # Update position for next time
+                else:
+                    # Not enough room - skip this identity for this batch
+                    break
+            
+            # Yield batch if it's valid (has at least K samples)
             if len(batch) >= self.K:
                 yield batch[:B]
+            else:
+                # Can't form a valid batch anymore
+                break
 
     def __len__(self) -> int:
-        return math.ceil(len(self.ids) * self.K / max(1, self.batch_size))
+        # Calculate based on total samples available
+        if len(self.ids) == 0:
+            return 0
+        
+        # Total samples across all valid identities
+        total_samples = sum(len(self.groups[pid]) for pid in self.ids)
+        num_ids = self.num_ids_per_batch
+        
+        # Each batch uses K samples per identity, up to num_ids identities
+        # So each batch uses at most: num_ids * K samples (which should be <= batch_size)
+        samples_per_batch = min(num_ids * self.K, self.batch_size)
+        
+        # Approximate number of batches: total samples / samples per batch
+        # This is an approximation since we cycle through samples
+        return max(1, math.ceil(total_samples / samples_per_batch))
 
 
 class ReplicateBatchSampler(Sampler):
@@ -46,11 +110,18 @@ class ReplicateBatchSampler(Sampler):
         groups = defaultdict(list)
         for i, rec in enumerate(records):
             groups[rec["smi_key"]].append(i)
-        rep_groups = [g for g in groups.values() if len(g) >= 2]
+        # Filter to groups with at least K samples (consistent with BalancedBatchSampler)
+        total_groups = len(groups)
+        rep_groups = [g for g in groups.values() if len(g) >= K]
+        if len(rep_groups) < total_groups:
+            filtered = total_groups - len(rep_groups)
+            print(f"[ReplicateBatchSampler] Filtered out {filtered}/{total_groups} groups with < {K} samples")
 
         self.rep_groups = rep_groups
         self.batch_size = batch_size
         self.K = K
+        if self.batch_size < self.K:
+            raise ValueError(f"batch_size ({batch_size}) must be >= K ({K})")
         self.rng = random.Random(seed)
 
     def __iter__(self):
@@ -60,19 +131,22 @@ class ReplicateBatchSampler(Sampler):
         for g in pool:
             glist = g[:]
             self.rng.shuffle(glist)
+            # Since we filtered to groups with >= K samples, this should always give K samples
             take = glist[:self.K]
-            if len(take) < self.K:
-                continue
             buf.extend(take)
             if len(buf) >= self.batch_size:
                 yield buf[:self.batch_size]
                 buf = []
         if buf:
-            # pad (rare)
-            while len(buf) < self.batch_size:
-                buf.append(buf[self.rng.randrange(len(buf))])
+            # Yield remaining items even if less than batch_size
+            # (Better than padding with duplicates which can cause issues)
             yield buf
 
     def __len__(self):
+        # Approximate: accounts for full batches + potentially one partial batch
         per_batch_ids = max(1, self.batch_size // max(1, self.K))
-        return max(1, len(self.rep_groups) // per_batch_ids)
+        full_batches = len(self.rep_groups) // per_batch_ids
+        remaining_items = (len(self.rep_groups) % per_batch_ids) * self.K
+        # Add 1 if there's a partial batch at the end
+        partial_batch = 1 if remaining_items > 0 else 0
+        return max(1, full_batches + partial_batch)

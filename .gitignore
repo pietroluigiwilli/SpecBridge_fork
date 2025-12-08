@@ -1,5 +1,5 @@
 runs/
-data/
+./data/
 cache/
 wandb/
 analysis_ms/
