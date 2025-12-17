@@ -70,7 +70,7 @@ class DreamsToMolCondition(nn.Module):
 
         # mapper and contrastive loss
         # self.mapB = MapperB(d_in = d_out, d_out=hid, hidden=mapper_hidden, gaussian=gaussian)
-        self.mapB = ProcrustesResidualMapper(d_in = d_out, d_out=hid, hidden=mapper_hidden, gaussian=gaussian)
+        self.mapB = ProcrustesResidualMapper(d_in = d_out, d_out=hid, n_blocks=args.n_blocks, hidden=mapper_hidden, gaussian=gaussian)
         self.contrast = InfoNCELoss(temperature=0.07, learnable_temp=True)
 
     def _chemberta_embed(self, smiles: list[str], device: torch.device) -> torch.Tensor:

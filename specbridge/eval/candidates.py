@@ -289,6 +289,7 @@ def main():
     ap.add_argument("--spec-bins", type=int, default=2048)
     ap.add_argument("--fp-bits", type=int, default=2048)
     ap.add_argument("--cond-dim", type=int, default=1024)   # single source of truth
+    ap.add_argument("--n-blocks", type=int, default=4, help="Number of blocks in the mapper")
     ap.add_argument("--mapper-hidden", type=int, default=0)
     ap.add_argument("--no-gaussian", action="store_true")
     ap.add_argument("--batch-size", type=int, default=256)
