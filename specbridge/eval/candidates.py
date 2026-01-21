@@ -7,6 +7,7 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 import json
+from tqdm import tqdm
 # Optional canonicalization (safer keys). Falls back to raw if RDKit is missing.
 try:
     from rdkit import Chem
@@ -289,7 +290,7 @@ def main():
     ap.add_argument("--spec-bins", type=int, default=2048)
     ap.add_argument("--fp-bits", type=int, default=2048)
     ap.add_argument("--cond-dim", type=int, default=1024)   # single source of truth
-    ap.add_argument("--n-blocks", type=int, default=4, help="Number of blocks in the mapper")
+    ap.add_argument("--n-blocks", type=int, default=8, help="Number of blocks in the mapper")
     ap.add_argument("--mapper-hidden", type=int, default=0)
     ap.add_argument("--no-gaussian", action="store_true")
     ap.add_argument("--batch-size", type=int, default=256)
@@ -436,7 +437,7 @@ def main():
     mces_distances: List[float] = []
     cosine_similarities: List[float] = []
     
-    for batch in dl:
+    for batch in tqdm(dl):
         s = batch["spectra"].to(device)
         meta = {k: (v.to(device) if torch.is_tensor(v) else v) for k, v in batch["meta"].items()}
         # print(meta['peaks'].shape)
@@ -560,14 +561,18 @@ def main():
                         cosine_similarities.append(cos_sim)
                 
                 # Compute MCES distance between true SMILES and top-1 predicted SMILES
-                # (regardless of whether top-1 is correct or not)
                 if args.compute_mces:
-                    top1_idx = int(order[0].item())
-                    top1_smi = kept[top1_idx]
-                    mces_dist = mces_distance(true_smi, top1_smi)
-                    # print(f"MCES distance between {true_smi} and {top1_smi}: {mces_dist}")
-                    if mces_dist != float('inf'):
-                        mces_distances.append(mces_dist)
+                    if r == 0:
+                        # Top-1 is correct, MCES = 0
+                        mces_distances.append(0.0)
+                    else:
+                        # Top-1 is incorrect, compute actual MCES distance
+                        top1_idx = int(order[0].item())
+                        top1_smi = kept[top1_idx]
+                        mces_dist = mces_distance(true_smi, top1_smi)
+                        # print(f"MCES distance between {true_smi} and {top1_smi}: {mces_dist}")
+                        if mces_dist != float('inf'):
+                            mces_distances.append(mces_dist)
             else:
                 missing_true += 1
 
@@ -598,7 +603,7 @@ def main():
         mces_median = sorted(mces_distances)[len(mces_distances) // 2]
         print(f"{'mces@1_mean':>10s}: {mces_mean:.2f}")
         print(f"{'mces@1_median':>10s}: {mces_median:.2f}")
-        print(f"[mces] computed for {len(mces_distances)} entries (true vs top-1 predicted)")
+        print(f"[mces] computed for {len(mces_distances)} entries (0 for correct top-1, distance for incorrect)")
 
 if __name__ == "__main__":
     main()

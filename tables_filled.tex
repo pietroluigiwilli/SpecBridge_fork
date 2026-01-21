@@ -1,0 +1,59 @@
+\begin{table}[h]
+\centering
+\caption{\textbf{Mapper Capacity Ablation.} Impact of varying residual depth ($n$) and hidden width ($h$) on performance.}
+\label{tab:mapper_capacity}
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{ccccccc}
+\toprule
+\multicolumn{2}{c}{\textbf{Mapper Config}} & \multicolumn{4}{c}{\textbf{Retrieval Accuracy}} & \textbf{Structure} \\
+\cmidrule(r){1-2} \cmidrule(lr){3-6} \cmidrule(l){7-7}
+\textbf{Depth} ($n$) & \textbf{Width} ($h$) & \textbf{R@1} & \textbf{R@5} & \textbf{R@20} & \textbf{MRR} & \textbf{MCES@1} $\downarrow$ \\
+\midrule
+% Linear (n=0)
+0 & 512 & 26.209 & 35.402 & 48.979 & 31.430 & 8.40 \\
+0 & 1024 & 27.026 & 36.366 & 49.973 & 32.296 & 8.26 \\
+0 & 2048 & 27.646 & 37.048 & 50.625 & 32.907 & 8.13 \\
+\midrule
+% Shallow (n=2)
+2 & 512 & 29.687 & 39.154 & 52.079 & 34.908 & 7.95 \\
+2 & 1024 & 30.492 & 39.916 & 52.900 & 35.715 & 7.77 \\
+2 & 2048 & 31.155 & 41.112 & 53.931 & 36.513 & 7.64 \\
+\midrule
+% Medium (n=4)
+4 & 512 & 29.693 & 39.318 & 52.401 & 34.979 & 7.88 \\
+4 & 1024 & 30.557 & 40.016 & 53.205 & 35.791 & 7.75 \\
+4 & 2048 & 31.171 & 41.067 & 54.076 & 36.505 & 7.64 \\
+\midrule
+% Deep (n=8)
+8 & 512 & 29.825 & 39.615 & 52.668 & 35.135 & 7.87 \\
+8 & 1024 & 30.629 & 40.170 & 53.489 & 35.838 & 7.75 \\
+8 & 2048 & \textbf{36.580} & \textbf{46.357} & \textbf{58.922} & \textbf{41.766} & \textbf{6.760} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+
+\paragraph{Spectrum unfreezing depth.}
+We recommend evaluating unfreezing schedules (frozen; last-1; last-2; last-4 blocks) to quantify the effect of limited spectrum-side adaptation on retrieval.
+% Spectrum Unfreezing Depth Results
+\begin{table}[h]
+\centering
+\caption{\textbf{Spectrum Encoder Adaptation.} Impact of unfreezing different numbers of transformer blocks.}
+\label{tab:unfreezing_depth}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lccccc}
+\toprule
+& \multicolumn{4}{c}{\textbf{Retrieval Accuracy}} & \textbf{Structure} \\
+\cmidrule(lr){2-5} \cmidrule(l){6-6}
+\textbf{Unfreezing Scope} & \textbf{R@1} & \textbf{R@5} & \textbf{R@20} & \textbf{MRR} & \textbf{MCES@1} $\downarrow$ \\
+\midrule
+Frozen (0) & --- & --- & --- & --- & --- \\
+Last-1 (1) & 36.186 & 46.084 & 58.931 & 41.494 & 6.81 \\
+Last-2 (2) & \textbf{36.580} & \textbf{46.357} & \textbf{58.922} & \textbf{41.766} & \textbf{6.76} \\
+Last-4 (4) & 33.612 & 42.588 & 55.099 & 38.548 & 7.23 \\
+\bottomrule
+\end{tabular}
+\end{table}

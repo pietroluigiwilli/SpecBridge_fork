@@ -1,0 +1,41 @@
+% Mapper Capacity Results
+\begin{table}[h]
+\centering
+\caption{Test set performance across mapper capacity configurations.}
+\label{tab:mapper_capacity}
+\begin{tabular}{lccccc}
+\toprule
+Config ($n$, $h$) & R@1 & R@5 & R@20 & MRR & MCES@1 (mean) \\
+\midrule
+$(0, 512)$ & --- & --- & --- & --- & --- \\
+$(0, 1024)$ & --- & --- & --- & --- & --- \\
+$(0, 2048)$ & --- & --- & --- & --- & --- \\
+$(2, 512)$ & 29.700 & 39.200 & 52.100 & 34.900 & 7.950 \\
+$(2, 1024)$ & --- & --- & --- & --- & --- \\
+$(2, 2048)$ & 31.155 & 41.112 & 53.931 & 36.513 & 7.640 \\
+$(4, 512)$ & --- & --- & --- & --- & --- \\
+$(4, 1024)$ & --- & --- & --- & --- & --- \\
+$(4, 2048)$ & 31.171 & 41.067 & 54.076 & 36.505 & 7.640 \\
+$(8, 512)$ & --- & --- & --- & --- & --- \\
+$(8, 1024)$ & --- & --- & --- & --- & --- \\
+$(8, 2048)$ & 36.580 & 46.357 & 58.922 & 41.766 & 6.760 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% Spectrum Unfreezing Depth Results
+\begin{table}[h]
+\centering
+\caption{Test set performance across spectrum unfreezing depth configurations.}
+\label{tab:unfreezing_depth}
+\begin{tabular}{lccccc}
+\toprule
+Unfreeze Depth & R@1 & R@5 & R@20 & MRR & MCES@1 (mean) \\
+\midrule
+Frozen (0) & --- & --- & --- & --- & --- \\
+Last-1 (1) & --- & --- & --- & --- & --- \\
+Last-2 (2) & 36.580 & 46.357 & 58.922 & 41.766 & 6.760 \\
+Last-4 (4) & --- & --- & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}

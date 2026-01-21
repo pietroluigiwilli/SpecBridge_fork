@@ -2,7 +2,8 @@
 set -uo pipefail
 
 # ========= Edit these to match your run =========
-RUN_DIR="runs/specbridge_align_chemberta_pub_v3g_spectraverse_mapper_spec"            # folder with ckpt_*.pt
+RUN_DIR="runs/optional_ablations_spectraverse/procrustes_random_init"            # folder with ckpt_*.pt
+# MGF="/cluster/tufts/liulab/yiwan01/SpecBridge/data/MSnLib/combined_ms2_with_folds.mgf"
 MGF="/cluster/tufts/liulab/yiwan01/SpecBridge/data/spectraverse_clean.mgf"
 DREAMS="/cluster/tufts/liulab/yiwan01/SpecBridge/data/ssl_model.ckpt"
 # CANDS="/cluster/tufts/liulab/yiwan01/massspecgym/cand_dict_large_form.pkl"
@@ -12,7 +13,7 @@ CANDS="/cluster/tufts/liulab/yiwan01/SpecBridge/data/candidates_test_val.pkl"
 # CANDS="/cluster/tufts/liulab/yiwan01//SpecBridge/data/cand_dict_merged.pkl"
 # CANDS="/cluster/tufts/liulab/yiwan01/SpecBridge/data/candidates_msnlib.pkl"
 FOLD="val"
-BATCH=32
+BATCH=128
 LIMIT=100000
 
 # Embedding space (pick ONE block)
@@ -73,6 +74,13 @@ fi
 shopt -s nullglob
 for CK in "${RUN_DIR}"/*.pt; do
   STEP=$(basename "${CK}" | sed -E 's/ckpt_0*([0-9]+)\.pt/\1/')
+  
+  # Skip checkpoints before step 30000
+  if [[ ${STEP} -lt 30000 ]]; then
+    echo ">>> Skipping ${CK} (step ${STEP} < 30000)"
+    continue
+  fi
+  
   LOG="${LOGDIR}/eval_${STEP}.log"
 
   echo ">>> Evaluating ${CK}"

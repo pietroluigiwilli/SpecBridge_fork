@@ -1,9 +1,11 @@
 runs/
-./data/
+data/
 cache/
 wandb/
+figs/
 analysis_ms/
 *.err
+*.json
 *.log
 .vscode/
 __pycache__/

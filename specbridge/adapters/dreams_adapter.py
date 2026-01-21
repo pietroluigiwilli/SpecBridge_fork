@@ -240,17 +240,72 @@ class DreamsAdapter(nn.Module):
         return unit_normalize(z)
 
     def unfreeze_last(self, n_layers: int = 1):
+        """Unfreeze the last N transformer layers in DreaMS model.
+        
+        This method specifically targets transformer layers in the DreaMS architecture,
+        which has transformer_encoder.atts and transformer_encoder.ffs as ModuleLists.
+        """
+        # First, try if the model has its own unfreeze_last method
         if hasattr(self.dreams, 'unfreeze_last') and callable(getattr(self.dreams, 'unfreeze_last')):
             try:
                 self.dreams.unfreeze_last(n_layers=n_layers)  # type: ignore
                 return
             except Exception:
                 pass
+        
+        # For DreaMS models, we need to target transformer_encoder layers specifically
+        if hasattr(self.dreams, 'transformer_encoder'):
+            te = self.dreams.transformer_encoder
+            
+            # Find transformer layers (atts and ffs are ModuleLists)
+            atts = None
+            ffs = None
+            if hasattr(te, 'atts') and isinstance(te.atts, torch.nn.ModuleList):
+                atts = te.atts
+            if hasattr(te, 'ffs') and isinstance(te.ffs, torch.nn.ModuleList):
+                ffs = te.ffs
+            
+            if atts is not None or ffs is not None:
+                # Determine how many layers to unfreeze
+                n_att_layers = len(atts) if atts is not None else 0
+                n_ff_layers = len(ffs) if ffs is not None else 0
+                n_total_layers = max(n_att_layers, n_ff_layers)
+                
+                if n_total_layers == 0:
+                    # No transformer layers found, fall back to generic method
+                    pass
+                else:
+                    n_unfreeze = min(n_layers, n_total_layers)
+                    
+                    # Unfreeze last N attention layers
+                    if atts is not None and len(atts) > 0:
+                        for layer in atts[-n_unfreeze:]:
+                            for p in layer.parameters():
+                                p.requires_grad = True
+                    
+                    # Unfreeze last N feedforward layers
+                    if ffs is not None and len(ffs) > 0:
+                        for layer in ffs[-n_unfreeze:]:
+                            for p in layer.parameters():
+                                p.requires_grad = True
+                    
+                    return
+        
+        # Fallback: generic unfreezing of last N children
         children = list(self.dreams.children())
         if len(children) == 0:
-            for p in list(self.dreams.parameters())[-1 * max(1, n_layers)]:
-                p.requires_grad = True
+            # If no children, try to unfreeze last N parameters (this is rarely correct)
+            params = list(self.dreams.parameters())
+            if len(params) > 0:
+                # This is a fallback - not ideal but better than nothing
+                n_unfreeze = min(n_layers, len(params))
+                for p in params[-n_unfreeze:]:
+                    p.requires_grad = True
             return
-        for mod in children[-n_layers:]:
+        
+        # Unfreeze last N child modules
+        n_unfreeze = min(n_layers, len(children))
+        for mod in children[-n_unfreeze:]:
             for p in mod.parameters():
                 p.requires_grad = True
+

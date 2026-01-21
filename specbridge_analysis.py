@@ -46,6 +46,13 @@ _HAS_RDKIT = False
 try:
     from rdkit import Chem, DataStructs
     from rdkit.Chem import AllChem, Draw
+    from rdkit import RDLogger
+    # Suppress all RDKit warnings about invalid SMILES/valence issues
+    RDLogger.DisableLog('rdApp.*')
+    RDLogger.DisableLog('rdApp.warning')
+    # Also suppress stderr output from RDKit
+    import warnings
+    warnings.filterwarnings('ignore', category=UserWarning, module='rdkit')
     _HAS_RDKIT = True
 except Exception:
     pass
@@ -117,6 +124,8 @@ def _l2norm_np(x: np.ndarray, eps: float = 1e-8) -> np.ndarray:
 def ecfp4(smiles: str, radius: int = 2, nbits: int = 4096):
     if not _HAS_RDKIT or not smiles:
         return None
+    # Suppress RDKit warnings during molecule creation
+    # RDKit warnings are already disabled globally, but ensure they stay suppressed
     m = Chem.MolFromSmiles(smiles)
     if m is None:
         return None
@@ -133,9 +142,17 @@ def angle_from_cos(c: float) -> float:
 
 def pearson_spearman(x: np.ndarray, y: np.ndarray):
     from scipy.stats import pearsonr, spearmanr
-    if len(x) < 2 or np.allclose(x, x[0]) or np.allclose(y, y[0]):
+    # Filter out NaN and inf values
+    mask = np.isfinite(x) & np.isfinite(y)
+    x_clean = x[mask]
+    y_clean = y[mask]
+    
+    if len(x_clean) < 2 or np.allclose(x_clean, x_clean[0]) or np.allclose(y_clean, y_clean[0]):
         return (np.nan, np.nan)
-    return (float(pearsonr(x, y)[0]), float(spearmanr(x, y)[0]))
+    try:
+        return (float(pearsonr(x_clean, y_clean)[0]), float(spearmanr(x_clean, y_clean)[0]))
+    except (ValueError, RuntimeError):
+        return (np.nan, np.nan)
 
 def auroc_ap(scores: np.ndarray, labels: np.ndarray):
     if len(np.unique(labels)) < 2:
@@ -352,6 +369,7 @@ def main():
     ap.add_argument("--spec-bins", type=int, default=2048)
     ap.add_argument("--fp-bits", type=int, default=2048)
     ap.add_argument("--cond-dim", type=int, default=2048)
+    ap.add_argument("--n-blocks", type=int, default=8)
     ap.add_argument("--mapper-hidden", type=int, default=2048)
     ap.add_argument("--no-gaussian", action="store_true")
     ap.add_argument("--batch-size", type=int, default=64)
@@ -375,6 +393,7 @@ def main():
     ap.add_argument("--umap-insets", type=int, default=0, help="number of molecule insets to draw (0 = off). Insets have transparent background.")
     ap.add_argument("--pair-max-same", type=int, default=200000)
     ap.add_argument("--pair-max-diff", type=int, default=200000)
+    ap.add_argument("--cache-cand-emb", type=str, default=None, help="Path to precomputed candidate embeddings (.pt file)")
     args = ap.parse_args()
 
     set_paper_style()
@@ -478,11 +497,33 @@ def main():
 
         # Precompute candidate embeddings
         cand_z: Dict[str, torch.Tensor] = {}
+        loaded_cache = False
         if need_smiles:
-            with torch.no_grad():
-                Z = embed_fn(need_smiles, device)
-                for s, z in zip(need_smiles, Z):
-                    cand_z[_canon_smi(s) or s.strip()] = z.cpu()
+            # Try to load precomputed embeddings if provided
+            if args.cache_cand_emb and os.path.exists(args.cache_cand_emb):
+                try:
+                    cand_z = torch.load(args.cache_cand_emb, map_location="cpu")
+                    loaded_cache = True
+                    print(f"[Cache] Loaded candidate embeddings from {args.cache_cand_emb} (|Z|={len(cand_z)})")
+                except Exception as e:
+                    warnings.warn(f"[Cache] Failed to load precomputed embeddings: {e}. Computing from scratch.")
+                    cand_z = {}
+            
+            # Compute missing embeddings
+            if not loaded_cache:
+                with torch.no_grad():
+                    Z = embed_fn(need_smiles, device)
+                    for s, z in zip(need_smiles, Z):
+                        cand_z[_canon_smi(s) or s.strip()] = z.cpu()
+            else:
+                # Check for missing embeddings and compute them
+                missing_smiles = [s for s in need_smiles if (_canon_smi(s) or s.strip()) not in cand_z]
+                if missing_smiles:
+                    print(f"[Cache] Computing {len(missing_smiles)} missing embeddings")
+                    with torch.no_grad():
+                        Z = embed_fn(missing_smiles, device)
+                        for s, z in zip(missing_smiles, Z):
+                            cand_z[_canon_smi(s) or s.strip()] = z.cpu()
 
         # Precompute true embeddings
         uniq_true = sorted({(_canon_smi(s) or s.strip()) for s in all_true if s})
@@ -828,6 +869,30 @@ def main():
         plt.tight_layout(pad=0.2)
         # transparent background for overlay-friendly exports
         savefig(outfig, fname, transparent=True)
+    
+    def _plot_umap_simple(X, title, fname, color=None):
+        """Simple UMAP visualization without class coloring."""
+        if not _HAS_UMAP or len(X) < 5:
+            return
+        # Filter out None values if present
+        valid_mask = np.array([x is not None for x in X])
+        if not np.any(valid_mask):
+            return
+        X_valid = [X[i] for i in range(len(X)) if valid_mask[i]]
+        
+        Xn = _l2norm_np(np.asarray(X_valid))
+        reducer = umap.UMAP(n_neighbors=60, min_dist=0.10, metric="cosine", random_state=args.seed)
+        Y = reducer.fit_transform(Xn)
+
+        # Simple scatter plot with single color
+        plt.figure(figsize=(4, 4), dpi=300)
+        plot_color = color if color else BLUE
+        plt.scatter(Y[:,0], Y[:,1], s=1.5, c=plot_color, alpha=0.6,
+                    edgecolors="none", linewidths=0, rasterized=False)
+        plt.title(title, fontsize=9)
+        plt.xticks([]); plt.yticks([])
+        plt.tight_layout(pad=0.2)
+        savefig(outfig, fname, transparent=True)
 
     # Build inputs for class UMAPs if we have labels
     # Ensure all three UMAPs use the same data (intersection of valid indices)
@@ -875,23 +940,28 @@ def main():
             
             print(f"[UMAP] Filtered samples for plotting: {len(dreams_common)}")
             
-            _plot_umap_class(dreams_common, labels_common, "DreaMS embeddings of mass spectra ($z_s$)", "umap_dreams_classes")
-            _plot_umap_class(mapped_common, labels_common, "Mapped spectra embeddings ($\\hat z$)", "umap_mapped_classes")
+            # Generate simple UMAPs for mapped and molecular embeddings (no class coloring)
+            _plot_umap_simple(mapped_common, "Mapped spectra embeddings ($\\hat z$)", "umap_mapped", color=BLUE)
+            print(f"[UMAP] Generated mapped embedding UMAP: umap_mapped")
             
-            # Add molecular embedding UMAP if available
+            # Generate molecular embedding UMAP (always generated if available)
             if mol_embeds is not None and len(mol_embeds) > 0:
                 mol_common = [mol_embeds[i] for i in range(min(len(mol_embeds), len(common_valid))) if i < len(common_valid) and common_valid[i]]
                 print(f"[UMAP] Molecular samples for plotting: {len(mol_common)}")
-                _plot_umap_class(mol_common, labels_common, "Molecular embeddings from model ($z_m$)", "umap_mol_classes")
+                if len(mol_common) >= 5:
+                    _plot_umap_simple(mol_common, "Molecular embeddings from model ($z_m$)", "umap_mol", color=ORANGE)
+                    print(f"[UMAP] Generated molecular embedding UMAP: umap_mol")
+                else:
+                    print(f"[UMAP] Warning: Not enough molecular embeddings ({len(mol_common)}) for UMAP")
+            else:
+                print(f"[UMAP] Warning: No molecular embeddings available for UMAP")
             
             # Create combined UMAP to compare mapped vs molecular in same space
             # This shows if mapped embeddings actually align with molecular embeddings
-            # Use the same common_valid indices as the separate UMAPs
-            if mol_embeds is not None and np.sum(common_valid) >= 5:
+            if mol_embeds is not None and len(mol_common) >= 5:
                 # Use the same filtered embeddings as the separate UMAPs
                 mapped_embeds_valid = mapped_common
                 mol_embeds_valid = mol_common
-                labels_valid = labels_common
                 
                 combined_embeds = mapped_embeds_valid + mol_embeds_valid
                 combined_Xn = _l2norm_np(np.asarray(combined_embeds))
@@ -903,53 +973,18 @@ def main():
                 mapped_Y = combined_Y[:n]
                 mol_Y = combined_Y[n:]
                 
-                # Plot comparison using same settings as _plot_umap_class
-                lab_arr = np.asarray(labels_valid, dtype=object)
-                uniq, counts = np.unique(lab_arr, return_counts=True)
-                order = np.argsort(-counts)
-                uniq = uniq[order]
-                topK = set(uniq[:args.umap_topk_classes].tolist())
-                mapped_labs = np.array([l if l in topK else "Other" for l in labels_valid], dtype=object)
-                
-                palette = [
-                    "#1f77b4",  # blue
-                    "#ff7f0e",  # orange
-                    "#2ca02c",  # green
-                    "#d62728",  # red
-                    "#9467bd",  # purple
-                    "#8c564b",  # brown
-                    "#e377c2",  # pink
-                    "#7f7f7f",  # grey
-                    "#bcbd22",  # olive
-                    "#17becf",  # cyan
-                    "#ff9896",  # light red
-                    "#c5b0d5",  # light purple
-                ]
-                names = sorted(set(mapped_labs.tolist()), key=lambda x: (x!="Other", x))
-                color_map = {n: palette[i % len(palette)] for i, n in enumerate(names)}
-                
-                plt.figure(figsize=(5.5, 4.5), dpi=300)
-                # Plot molecular embeddings (circles)
-                for n in names:
-                    m = (mapped_labs == n)
-                    if np.any(m):
-                        plt.scatter(mol_Y[m,0], mol_Y[m,1], s=1.2, c=color_map[n], alpha=0.6,
-                                   edgecolors="none", linewidths=0, label=f"{n} (mol)", marker="o", rasterized=False)
-                # Plot mapped embeddings (triangles) - same settings
-                for n in names:
-                    m = (mapped_labs == n)
-                    if np.any(m):
-                        plt.scatter(mapped_Y[m,0], mapped_Y[m,1], s=1.2, c=color_map[n], alpha=0.6,
-                                   edgecolors="none", linewidths=0, label=f"{n} (mapped)", marker="^", rasterized=False)
-                # Find best legend position for combined plot
-                combined_Y_all = np.vstack([mapped_Y, mol_Y])
-                best_loc_combined = _find_best_legend_pos(combined_Y_all)
-                plt.legend(frameon=False, loc=best_loc_combined, markerscale=2.0, ncol=2, 
-                          fontsize=5, columnspacing=0.8, handletextpad=0.3)
+                # Simple plot: mapped in blue, molecular in orange
+                plt.figure(figsize=(4, 4), dpi=300)
+                plt.scatter(mapped_Y[:,0], mapped_Y[:,1], s=1.5, c=BLUE, alpha=0.6,
+                            edgecolors="none", linewidths=0, label="Mapped ($\\hat z$)", rasterized=False, marker="o")
+                plt.scatter(mol_Y[:,0], mol_Y[:,1], s=1.5, c=ORANGE, alpha=0.6,
+                            edgecolors="none", linewidths=0, label="Molecular ($z_m$)", rasterized=False, marker="^")
+                plt.legend(frameon=False, loc="best", markerscale=2.0, fontsize=7)
                 plt.title("Mapped vs Molecular embeddings (same UMAP space)", fontsize=9)
                 plt.xticks([]); plt.yticks([])
                 plt.tight_layout(pad=0.2)
                 savefig(outfig, "umap_mapped_vs_mol_combined", transparent=True)
+                print(f"[UMAP] Generated combined UMAP: umap_mapped_vs_mol_combined")
                 
                 # Also compute cosine similarity statistics
                 mapped_np = _l2norm_np(np.asarray(mapped_embeds_valid))

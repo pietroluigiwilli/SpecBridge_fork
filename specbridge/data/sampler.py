@@ -150,3 +150,69 @@ class ReplicateBatchSampler(Sampler):
         # Add 1 if there's a partial batch at the end
         partial_batch = 1 if remaining_items > 0 else 0
         return max(1, full_batches + partial_batch)
+
+
+class UniqueSMILESBatchSampler(Sampler[List[int]]):
+    """Ensures no duplicate SMILES in each batch for fair contrastive learning.
+    This prevents same-SMILES samples from being treated as negatives in InfoNCE loss.
+    Includes ALL data points - makes multiple passes to include all samples.
+    """
+    def __init__(self, records, batch_size: int = 256, shuffle: bool = True):
+        self.records = records
+        self.batch_size = batch_size
+        self.shuffle = shuffle
+        
+        # Group samples by SMILES
+        self.groups = defaultdict(list)
+        for i, rec in enumerate(records):
+            self.groups[rec["smi_key"]].append(i)
+        
+        self.smiles_list = list(self.groups.keys())
+        print(f"[UniqueSMILESBatchSampler] {len(self.smiles_list)} unique SMILES, {len(records)} total samples")
+        
+        # Find max samples per SMILES to know how many passes we need
+        self.max_samples_per_smiles = max(len(samples) for samples in self.groups.values()) if self.groups else 0
+
+    def __iter__(self):
+        # Shuffle SMILES order once per epoch
+        smiles_order = self.smiles_list[:]
+        if self.shuffle:
+            random.shuffle(smiles_order)
+        
+        # Make multiple passes: in each pass, take one sample from each SMILES
+        # This ensures all samples are included across all batches
+        for pass_num in range(self.max_samples_per_smiles):
+            batch: List[int] = []
+            used_smiles_in_batch = set()
+            
+            # Shuffle SMILES order for each batch
+            if self.shuffle:
+                random.shuffle(smiles_order)
+            
+            for smiles in smiles_order:
+                # Skip if this SMILES is already in the current batch
+                if smiles in used_smiles_in_batch:
+                    continue
+                
+                samples = self.groups[smiles]
+                # If this SMILES has a sample at this pass number, add it
+                if pass_num < len(samples):
+                    sample_idx = samples[pass_num]
+                    batch.append(sample_idx)
+                    used_smiles_in_batch.add(smiles)
+                    
+                    # If batch is full, yield it and start new batch
+                    if len(batch) >= self.batch_size:
+                        yield batch[:self.batch_size]
+                        batch = []
+                        used_smiles_in_batch = set()
+            
+            # Yield remaining samples in batch if any
+            if batch:
+                yield batch
+
+    def __len__(self) -> int:
+        # Approximate: number of passes * (unique SMILES / batch_size)
+        passes = self.max_samples_per_smiles
+        batches_per_pass = max(1, math.ceil(len(self.smiles_list) / self.batch_size))
+        return passes * batches_per_pass

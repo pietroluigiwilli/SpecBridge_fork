@@ -366,7 +366,7 @@ def train_real(args):
 
 
     # Batching with K replicates per identity
-    # sampler = BalancedBatchSampler(ds._records, batch_size=args.batch_size, K=args.K, shuffle=True)
+    sampler = BalancedBatchSampler(ds._records, batch_size=args.batch_size, K=args.K, shuffle=True)
     
 
     # sampler = ReplicateBatchSampler(ds._records, args.batch_size, K=args.supcon_k, seed=args.seed)
@@ -787,6 +787,7 @@ if __name__ == "__main__":
     p.add_argument("--save-every", type=int, default=1000)
     p.add_argument("--resume", type=str, default=None)
     p.add_argument("--n-blocks", type=int, default=4, help="number of blocks for ProcrustesResidualMapper")
+    p.add_argument("--random-mapper-init", action="store_true", help="Use random (Xavier uniform) initialization for mapper instead of orthogonal/Procrustes init")
     p.add_argument("--fold", type=str, default='train', help="Filter by MGF FOLD (e.g., 'train', 'val', 'test' or comma-separated)")
     p.add_argument("--w-supcon", type=float, default=1.0, help="weight for multi-positive SupCon(z_s,z_m)")
     p.add_argument("--supcon-temp", type=float, default=0.07, help="temperature for SupCon")

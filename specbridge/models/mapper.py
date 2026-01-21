@@ -70,7 +70,10 @@ class DreamsToMolCondition(nn.Module):
 
         # mapper and contrastive loss
         # self.mapB = MapperB(d_in = d_out, d_out=hid, hidden=mapper_hidden, gaussian=gaussian)
-        self.mapB = ProcrustesResidualMapper(d_in = d_out, d_out=hid, n_blocks=args.n_blocks, hidden=mapper_hidden, gaussian=gaussian)
+        random_mapper_init = getattr(args, 'random_mapper_init', False) if args is not None else False
+        if random_mapper_init:
+            print(f"[mapper] Using random (Xavier uniform) initialization instead of orthogonal/Procrustes init")
+        self.mapB = ProcrustesResidualMapper(d_in = d_out, d_out=hid, n_blocks=args.n_blocks, hidden=mapper_hidden, gaussian=gaussian, random_init=random_mapper_init)
         self.contrast = InfoNCELoss(temperature=0.07, learnable_temp=True)
 
     def _chemberta_embed(self, smiles: list[str], device: torch.device) -> torch.Tensor:
@@ -239,13 +242,18 @@ class ProcrustesResidualMapper(nn.Module):
     """
     x_s -> z_m: W0 (near-orthogonal) + small residual MLP.
     """
-    def __init__(self, d_in, d_out, n_blocks=4, hidden=0, drop=0.0, gaussian=False):
+    def __init__(self, d_in, d_out, n_blocks=4, hidden=0, drop=0.0, gaussian=False, random_init=False):
         super().__init__()
         self.gaussian = gaussian
         # main linear
         self.W = nn.Linear(d_in, d_out, bias=True)
-        nn.init.orthogonal_(self.W.weight)  # good default
-        nn.init.zeros_(self.W.bias)
+        if random_init:
+            # Random initialization (Xavier uniform)
+            nn.init.xavier_uniform_(self.W.weight)
+        else:
+            # Procrustes initialization (orthogonal)
+            nn.init.orthogonal_(self.W.weight)  # good default
+            nn.init.zeros_(self.W.bias)
         # residual stack (light capacity)
         hidden = hidden if hidden > 0 else max(256, min(d_out, 1024))
         self.blocks = nn.ModuleList([ResidualBlock(d_out, hidden, drop) for _ in range(n_blocks)])

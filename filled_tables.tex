@@ -1,0 +1,59 @@
+% Filled-in LaTeX tables for SpecBridge paper
+
+% Table 1: Hyperparameters
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{ll}
+\toprule
+\textbf{Setting} & \textbf{Value} \\
+\midrule
+Spectrum encoder init. & DreaMS self-supervised checkpoint \\
+Molecule encoder init. & ChemBERTa (\texttt{Derify/ChemBERTa\_augmented\_pubchem\_13m}) \\
+Trainable spectrum layers & last-2 transformer blocks (others frozen) \\
+Mapper & Procrustes linear map + $n=8$ residual blocks \\
+Mapper hidden width & 2048 \\
+Conditioning dim $d_{\mathrm{cond}}$ & 2048 \\
+Learning rate & $1\times 10^{-4}$ \\
+Batch size & 128 \\
+Epochs & 2 \\
+Checkpointing & every 200 steps \\
+Model selection & validation Recall@5 \\
+Orthogonality weight $\lambda_{\text{ortho}}$ & $10^{-3}$ \\
+Alignment weight $w_{\text{map}}$ & $5.0$ \\
+Contrastive weights & $w_{\text{con}}=1.0$, $w_{\text{con\_mapped}}=1.0$ (defaults; standard alignment runs use $w_{\text{con}}=0$, $w_{\text{con\_mapped}}=0$) \\
+Temperature (contrastive) & $0.07$ \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Default hyperparameters for SpecBridge.}
+Values shown correspond to our standard training configuration; we report any deviations in the experiment description.
+All values are confirmed from the training code and standard run configurations.}
+\label{tab:impl_hparams}
+\end{table}
+
+% Table 2: Parameter counts
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lrr}
+\toprule
+\textbf{Component} & \textbf{\#Params} & \textbf{\#Trainable} \\
+\midrule
+Molecule encoder (ChemBERTa) & 43,961,088 & 0 \\
+Spectrum encoder (DreaMS total) & 95,549,381 & 25,174,016 \\
+Spectrum projection head & 6,299,648 & 6,299,648 \\
+Mapper $g_\theta$ & 26,774,272 & 26,774,272 \\
+\midrule
+\textbf{Total} & 172,584,389 & 58,247,936 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Trainable parameter counts.}
+SpecBridge updates only the mapper and a small suffix of the spectrum encoder (last two transformer blocks), while keeping ChemBERTa fixed.
+Parameter counts are confirmed by loading the actual models in the training environment.}
+\label{tab:param_breakdown}
+\end{table}
+

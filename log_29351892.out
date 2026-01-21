@@ -1,0 +1,6 @@
+[dataset] records=194119 | train=194119 | formulas=17634 | adducts=2 | charges=1
+[dataset] records=194119 | train=194119 | formulas=17634 | adducts=2 | charges=1 | preview_unique_smiles=131 | '#C'=0
+[BalancedBatchSampler] Filtered out 15735/25046 identities with < 4 samples
+Using dreams encoder from checkpoint /cluster/tufts/liulab/yiwan01/SpecBridge/data/ssl_model.ckpt
+[device] cuda_available= True device= cuda model= cuda:0 dreams= cuda:0
+75850
