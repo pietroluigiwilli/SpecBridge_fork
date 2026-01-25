@@ -119,7 +119,6 @@ The script will:
 - Generate a summary CSV file (`eval_summary_${FOLD}_all.csv`) with metrics (R@1, R@5, R@20, MRR, median_rank)
 - Skip checkpoints that have already been evaluated
 - Display the top 5 checkpoints by R@5
-```
 
 ### Evaluation
 
