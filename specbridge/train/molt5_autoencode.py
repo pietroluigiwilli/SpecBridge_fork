@@ -7,7 +7,7 @@ Examples
 --------
 # Train on train fold (ChemBERTa embedding as condition), save checkpoint
 python -m specbridge.train.molt5_autoencode \
-  --mgf /cluster/tufts/liulab/yiwan01/SpecBridge/data/MassSpecGym.mgf \
+  --mgf path/to/your/data.mgf \
   --fold-query train \
   --epochs 3 --batch-size 64 \
   --mode chem --chemberta-model seyonec/ChemBERTa-zinc-base-v1 \
@@ -16,7 +16,7 @@ python -m specbridge.train.molt5_autoencode \
 
 # Eval on test fold using the trained checkpoint
 python -m specbridge.train.molt5_autoencode \
-  --mgf /cluster/tufts/liulab/yiwan01/SpecBridge/data/MassSpecGym.mgf \
+  --mgf path/to/your/data.mgf \
   --fold-query test \
   --mode chem --chemberta-model seyonec/ChemBERTa-zinc-base-v1 \
   --t5 laituan245/molt5-small --prompt-len 10 --freeze-lm \

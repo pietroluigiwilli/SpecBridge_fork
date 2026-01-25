@@ -1,128 +1,238 @@
-# SpecBridge
+# SpecBridge: Bridging Mass Spectrometry and Molecular Representations via Cross-Modal Alignment
 
 SpecBridge provides a DreaMS-conditioned adapter for spectra->molecule mapping and a training pipeline with synthetic and real (MGF) data.
 
-## Introduction
+![SpecBridge Overview](assets/specbridge_overview.png)
 
-### Getting Candidates
 
-To generate candidate molecules for evaluation, use the `build_pubchem_candidates.py` script:
+## Installation
 
+### Quick Setup
+
+1. **Create conda environment:**
+   ```bash
+   conda env create -f environment.yml
+   conda activate specbridge
+   ```
+
+2. **Install SpecBridge:**
+   ```bash
+   pip install -e .
+   ```
+
+3. **Install DreaMS dependency:**
+   ```bash
+   cd DreaMS
+   pip install -e .
+   cd ..
+   ```
+
+For detailed setup instructions, troubleshooting, and alternative installation methods, see [SETUP_ENVIRONMENT.md](SETUP_ENVIRONMENT.md).
+
+## Getting Started
+
+### Pre-trained Models
+
+**DreaMS pre-trained weights** are available at: [https://zenodo.org/records/10997887](https://zenodo.org/records/10997887)
+
+**SpecBridge pre-trained adapters, datasets, and candidate files** are available at: [https://zenodo.org/records/18357418](https://zenodo.org/records/18357418) (DOI: [10.5281/zenodo.18357418](https://doi.org/10.5281/zenodo.18357418))
+
+### Datasets and Candidate Files
+
+The following datasets are supported with their corresponding candidate files. **Download from [Zenodo](https://zenodo.org/records/18357418)**:
+
+- **MassSpecGym (MSGYM)**: 
+  - MGF: `SpecBridge_MassSpecGym_dataset.mgf`
+  - Candidates: `SpecBridge_MSGYM_candidates.pkl`
+
+- **Spectraverse**: 
+  - MGF: `SpecBridge_Spectraverse_dataset.mgf`
+  - Candidates: `SpecBridge_Spectraverse_candidates.pkl`
+  
+- **MSnLib**: 
+  - MGF: `SpecBridge_MSnLib_dataset.mgf`
+  - Candidates: `SpecBridge_MSnLib_candidates.pkl`
+
+**Quick Download:** Use the provided script to download all files:
 ```bash
-python build_pubchem_candidates.py input_mgf candidates --max-per 200 --ppm 10 --by-fold test --workers 16
+./download_from_zenodo.sh
 ```
 
-This script will:
-- Process the MGF file (`input_mgf`)
-- Generate candidate molecules from PubChem
-- Save candidates to a pickle file (`candidates`)
-- Limit to 200 candidates per spectrum (`--max-per 200`)
-- Use 10 ppm mass tolerance (`--ppm 10`)
-- Filter by fold (e.g., `test`)
-- Use 16 worker processes for parallelization
+This will automatically download files to the correct directories:
+- Checkpoints → `runs/msgym/`, `runs/msnlib/`, `runs/spectraverse/`
+- Datasets → `data/SpecBridge_*_dataset.mgf`
+- Candidates → `data/SpecBridge_*_candidates.pkl`
 
-### Getting DreaMS ckpt:
-Weights of pre-trained models: [https://zenodo.org/records/10997887](https://zenodo.org/records/10997887)
+Files keep their Zenodo names. Make sure to use the matching candidate file for your MGF dataset when running evaluation.
 
-### Running Evaluation
+### Training
 
-To evaluate the model on a dataset with candidates:
+To train the adapter on your MGF data:
 
 ```bash
-python -m specbridge.eval.candidates \
-    --mgf input_mgf \
-    --dreams-ckpt /cluster/tufts/liulab/yiwan01/SpecBridge/data/ssl_model.ckpt \
-    --adapter-ckpt runs/specbridge_align_chemberta_pub_v3g/ckpt_000400.pt \
-    --candidates candidates \
-    --fold-query test \
-    --use-mapped \
-    --deterministic-map \
-    --no-gaussian \
-    --batch-size 32 \
+python -m specbridge.train.train \
+    --mgf path/to/your/data.mgf \
+    --dreams-ckpt path/to/ssl_model.ckpt \
+    --fold train \
+    --batch-size 128 \
+    --epochs 2 \
     --cond-dim 2048 \
     --mapper-hidden 2048 \
-    --mol-space chemberta \
-    --chemberta-model Derify/ChemBERTa_augmented_pubchem_13m
-```
-
-**Note:** The MGF file will be provided. Make sure to update the paths to your specific MGF file location.
-
-# SpecBridge
-
-SpecBridge provides a DreaMS-conditioned adapter for spectra->molecule mapping and a training pipeline with synthetic and real (MGF) data.
-
-## Introduction
-
-### Getting Candidates
-
-To generate candidate molecules for evaluation, use the `build_pubchem_candidates.py` script:
-
-```bash
-python build_pubchem_candidates.py input_mgf candidates --max-per 200 --ppm 10 --by-fold test --workers 16
-```
-
-This script will:
-- Process the MGF file (`input_mgf`)
-- Generate candidate molecules from PubChem
-- Save candidates to a pickle file (`candidates`)
-- Limit to 200 candidates per spectrum (`--max-per 200`)
-- Use 10 ppm mass tolerance (`--ppm 10`)
-- Filter by fold (e.g., `test`)
-- Use 16 worker processes for parallelization
-
-### Running Evaluation
-
-To evaluate the model on a dataset with candidates:
-
-```bash
-python -m specbridge.eval.candidates \
-    --mgf input_mgf \
-    --dreams-ckpt /cluster/tufts/liulab/yiwan01/SpecBridge/data/ssl_model.ckpt \
-    --adapter-ckpt runs/specbridge_align_chemberta_pub_v3g/ckpt_000400.pt \
-    --candidates candidates \
-    --fold-query test \
-    --use-mapped \
-    --deterministic-map \
     --no-gaussian \
-    --batch-size 32 \
-    --cond-dim 2048 \
-    --mapper-hidden 2048 \
-    --mol-space chemberta \
-    --chemberta-model Derify/ChemBERTa_augmented_pubchem_13m
-```
-
-**Note:** The MGF file will be provided. Make sure to update the paths to your specific MGF file location.
-
-
-python dreams_condition_adapter.py   --mgf /cluster/tufts/liulab/yiwan01/SpecBridge/data/MassSpecGym.mgf   --dreams-ckpt /cluster/tufts/liulab/yiwan01/SpecBridge/data/ssl_model.ckpt   --fold train   --batch-size 128 --epochs 2   --cond-dim 2048 --mapper-hidden 2048   --no-gaussian   --supcon-k 4   --w-con 0 --w-con-mapped 0 --w-map 5.0 --w-ortho 1e-3   --w-supcon 1.0 --supcon-temp 0.07   --w-hard 0.0 --hard-topk 16 --hard-temp 0.07   --w-iso 0.5 --iso-k 8 --iso-temp 0.07   --log-every 50 --save-every 200   --outdir runs/specbridge_align_chemberta_pub_v3g_msgym_mapper_spec   --mol-space chemberta --chemberta-model Derify/ChemBERTa_augmented_pubchem_13m  --lr 1e-4 --n-blocks 8 --unfreeze-last 2 --unfreeze-after 0
-
-python dreams_condition_adapter.py   --mgf /cluster/tufts/liulab/yiwan01/SpecBridge/data/spectraverse_clean.mgf   --dreams-ckpt /cluster/tufts/liulab/yiwan01/SpecBridge/data/ssl_model.ckpt   --fold train   --batch-size 32 --epochs 2   --cond-dim 2048 --mapper-hidden 2048   --no-gaussian   --supcon-k 4   --w-con 0 --w-con-mapped 0 --w-map 5.0 --w-ortho 1e-3   --w-supcon 1.0 --supcon-temp 0.07   --w-hard 0.0 --hard-topk 16 --hard-temp 0.07   --w-iso 0.5 --iso-k 8 --iso-temp 0.07   --log-every 50 --save-every 200   --outdir runs/specbridge_align_chemberta_pub_v3g_spectraverse_mapper_spec   --mol-space chemberta --chemberta-model Derify/ChemBERTa_augmented_pubchem_13m  --lr 1e-4 --n-blocks 8 --unfreeze-last 2 --unfreeze-after 0
-
-python dreams_condition_adapter.py   --mgf /cluster/tufts/liulab/yiwan01/SpecBridge/data/MSnLib/combined_ms2_with_folds.mgf   --dreams-ckpt /cluster/tufts/liulab/yiwan01/SpecBridge/data/ssl_model.ckpt   --fold train   --batch-size 32 --epochs 2   --cond-dim 2048 --mapper-hidden 2048   --no-gaussian   --supcon-k 4   --w-con 0 --w-con-mapped 0 --w-map 5.0 --w-ortho 1e-3   --w-supcon 1.0 --supcon-temp 0.07   --w-hard 0.0 --hard-topk 16 --hard-temp 0.07   --w-iso 0.5 --iso-k 8 --iso-temp 0.07   --log-every 50 --save-every 200   --outdir runs/specbridge_align_chemberta_pub_v3g_msnlib_mapper_spec   --mol-space chemberta --chemberta-model Derify/ChemBERTa_augmented_pubchem_13m  --lr 1e-4 --n-blocks 8 --unfreeze-last 2 --unfreeze-after 0
-
-
-python dreams_condition_adapter.py   --mgf /cluster/tufts/liulab/yiwan01/SpecBridge/data/nist23.mgf   --dreams-ckpt /cluster/tufts/liulab/yiwan01/SpecBridge/data/ssl_model.ckpt   --fold train   --batch-size 64 --epochs 2   --cond-dim 2048 --mapper-hidden 2048   --no-gaussian   --supcon-k 4   --w-con 0 --w-con-mapped 0.005 --w-map 5.0 --w-ortho 1e-3   --w-supcon 1.0 --supcon-temp 0.07   --w-hard 0.0 --hard-topk 16 --hard-temp 0.07   --w-iso 0.5 --iso-k 8 --iso-temp 0.07   --log-every 50 --save-every 100   --outdir runs/specbridge_align_chemberta_pub_v3g_nist_contrafintune   --mol-space chemberta --chemberta-model Derify/ChemBERTa_augmented_pubchem_13m  --lr 1e-5 --unfreeze-last 2 --unfreeze-after 0 --unfreeze-mol-last 2 --unfreeze-mol-after 0
-
-
-python dreams_condition_adapter.py   --mgf /cluster/tufts/liulab/yiwan01/SpecBridge/data/MassSpecGym.mgf   --dreams-ckpt /cluster/tufts/liulab/yiwan01/SpecBridge/data/ssl_model.ckpt   --fold train   --batch-size 128 --epochs 2   --cond-dim 2048 --mapper-hidden 2048   --no-gaussian   --supcon-k 4   --w-con 0 --w-con-mapped 0 --w-map 5.0 --w-ortho 1e-3   --w-supcon 1.0 --supcon-temp 0.07   --w-hard 0.0 --hard-topk 16 --hard-temp 0.07   --w-iso 0.5 --iso-k 8 --iso-temp 0.07   --log-every 50 --save-every 200   --outdir runs/specbridge_align_chemberta_pub_v3g_msgym_fintunedrug   --mol-space chemberta --chemberta-model Derify/ChemBERTa-druglike  --lr 1e-5 --unfreeze-last 2 --unfreeze-after 0 --unfreeze-mol-last 2 --unfreeze-mol-after 0
-
-
-finetune: 
-
---unfreeze-last 2 --unfreeze-after 0 --unfreeze-mol-last 2 --unfreeze-mol-after 0
-
-CUDA_VISIBLE_DEVICES=1 python -m specbridge.eval.candidates     --mgf /cluster/tufts/liulab/yiwan01/SpecBridge/data/MSnLib/combined_ms2_with_folds.mgf     --dreams-ckpt /cluster/tufts/liulab/yiwan01/SpecBridge/data/ssl_model.ckpt     --adapter-ckpt /cluster/tufts/liulab/yiwan01/SpecBridge/runs/specbridge_align_chemberta_pub_v3g_msnlib_mapper_spec/ckpt_026000.pt    --candidates /cluster/tufts/liulab/yiwan01/SpecBridge/data/candidates_msnlib.pkl --fold-query test --use-mapped --deterministic-map --no-gaussian     --batch-size 32     --cond-dim 2048 --mapper-hidden 2048     --mol-space chemberta --chemberta-model Derify/ChemBERTa_augmented_pubchem_13m --compute-mces
-
-CUDA_VISIBLE_DEVICES=0 python -m specbridge.eval.candidates     --mgf /cluster/tufts/liulab/yiwan01/SpecBridge/data/spectraverse_clean.mgf     --dreams-ckpt /cluster/tufts/liulab/yiwan01/SpecBridge/data/ssl_model.ckpt     --adapter-ckpt /cluster/tufts/liulab/yiwan01/SpecBridge/runs/optional_ablations_spectraverse/procrustes_random_init/ckpt_034000.pt    --candidates /cluster/tufts/liulab/yiwan01/SpecBridge/data/candidates_test_val.pkl --fold-query test --use-mapped --deterministic-map --no-gaussian     --batch-size 32     --cond-dim 2048 --mapper-hidden 2048     --mol-space chemberta --chemberta-model Derify/ChemBERTa_augmented_pubchem_13m --cache /cluster/tufts/liulab/yiwan01/SpecBridge/cache/cands_test_chemberta_pub_v3g_spectraverse.pt
-
-python -m specbridge.eval.predict_smiles \
-    --mgf /cluster/tufts/liulab/yiwan01/SpecBridge/data/MSnLib/combined_ms2_with_folds.mgf \
-    --dreams-ckpt /cluster/tufts/liulab/yiwan01/SpecBridge/data/ssl_model.ckpt \
-    --adapter-ckpt /cluster/tufts/liulab/yiwan01/SpecBridge/runs/specbridge_align_chemberta_pub_v3g_msnlib_mapper_spec/ckpt_026000.pt \
-    --candidates-json /cluster/tufts/liulab/yiwan01/SpecBridge/data/candidates_msnlib.pkl \
-    --output predictions.json \
-    --use-mapped --deterministic-map \
-    --cond-dim 2048 --mapper-hidden 2048 \
+    --supcon-k 4 \
+    --w-con 0 \
+    --w-con-mapped 0 \
+    --w-map 5.0 \
+    --w-ortho 1e-3 \
+    --w-supcon 1.0 \
+    --supcon-temp 0.07 \
+    --log-every 50 \
+    --save-every 200 \
+    --outdir runs/your_experiment_name \
     --mol-space chemberta \
     --chemberta-model Derify/ChemBERTa_augmented_pubchem_13m \
-    --handle-duplicates keep_first 
+    --lr 1e-4 \
+    --n-blocks 8 \
+    --unfreeze-last 2 \
+    --unfreeze-after 0
+```
+
+### Batch Evaluation of Checkpoints
+
+After training, you can use `eval_all.sh` to automatically evaluate all checkpoints in a run directory:
+
+```bash
+# Edit eval_all.sh to configure:
+# - RUN_DIR: path to your training run directory
+# - MGF: path to your MGF dataset
+# - CANDS: path to candidate file matching your dataset
+# - FOLD: evaluation fold (train/val/test)
+# - Other parameters (batch size, embedding space, etc.)
+
+# Run evaluation
+./eval_all.sh
+```
+
+The script will:
+- Loop through all checkpoints (`ckpt_*.pt`) in the run directory
+- Evaluate each checkpoint on the specified dataset
+- Generate a summary CSV file (`eval_summary_${FOLD}_all.csv`) with metrics (R@1, R@5, R@20, MRR, median_rank)
+- Skip checkpoints that have already been evaluated
+- Display the top 5 checkpoints by R@5
+```
+
+### Evaluation
+
+To evaluate a single checkpoint on a dataset with candidates:
+
+```bash
+python -m specbridge.eval.candidates \
+    --mgf path/to/your/data.mgf \
+    --dreams-ckpt path/to/ssl_model.ckpt \
+    --adapter-ckpt path/to/adapter/ckpt.pt \
+    --candidates path/to/candidates.pkl \
+    --fold-query test \
+    --use-mapped \
+    --deterministic-map \
+    --no-gaussian \
+    --batch-size 32 \
+    --cond-dim 2048 \
+    --mapper-hidden 2048 \
+    --mol-space chemberta \
+    --chemberta-model Derify/ChemBERTa_augmented_pubchem_13m
+```
+
+
+## Package Structure
+
+- `specbridge/` - Core package code
+  - `adapters/` - DreaMS adapter implementation
+  - `data/` - Data loading and processing
+  - `eval/` - Evaluation scripts
+  - `models/` - Model definitions
+  - `losses/` - Loss functions
+  - `train/` - Training scripts
+    - `train.py` - Main training script
+  - `utils/` - Utility functions
+- `DreaMS/` - DreaMS dependency
+
+## Pre-trained SpecBridge Checkpoints
+
+Pre-trained SpecBridge adapter checkpoints, datasets, and candidate files are available on Zenodo:
+
+**[📦 Download from Zenodo](https://zenodo.org/records/18357418)** | DOI: [10.5281/zenodo.18357418](https://doi.org/10.5281/zenodo.18357418)
+
+The Zenodo dataset includes:
+
+### Best Performing Checkpoints (Validation Set)
+- **MSGYM**: `SpecBridge_MSGYM_checkpoint.pt` (step 1200, R@5=0.91528, MRR=0.87518)
+- **MSnLib**: `SpecBridge_MSnLib_checkpoint.pt` (step 26000, R@5=0.59368, MRR=0.56004)
+- **Spectraverse**: `SpecBridge_Spectraverse_checkpoint.pt` (step 20600, R@5=0.43532, MRR=0.39055)
+
+### Datasets (MGF Files)
+- `SpecBridge_MassSpecGym_dataset.mgf` - MassSpecGym dataset
+- `SpecBridge_MSnLib_dataset.mgf` - MSnLib dataset with train/val/test folds
+- `SpecBridge_Spectraverse_dataset.mgf` - Spectraverse dataset
+
+### Candidate Files
+- `SpecBridge_MSGYM_candidates.pkl` - MSGYM candidate dictionary (SMILES format)
+- `SpecBridge_MSnLib_candidates.pkl` - MSnLib candidate dictionary
+- `SpecBridge_Spectraverse_candidates.pkl` - Spectraverse candidate dictionary
+
+**Note:** Files are restricted access. Please request access through the Zenodo record page if needed.
+
+**Download Script:** Use `./download_from_zenodo.sh` to automatically download all files to the correct local directories.
+
+## Requirements
+
+See `pyproject.toml` for dependencies. Main requirements:
+- Python >= 3.10
+- PyTorch >= 2.1
+- NumPy >= 1.24
+- pyteomics >= 4.7.5
+
+Optional dependencies:
+- `rdkit-pypi` for molecular processing
+- `wandb` for experiment tracking
+
+## Data Files
+
+### Downloading from Zenodo
+
+All pre-trained checkpoints, datasets, and candidate files are available on Zenodo:
+
+**[📦 Zenodo Dataset](https://zenodo.org/records/18357418)** | DOI: [10.5281/zenodo.18357418](https://doi.org/10.5281/zenodo.18357418)
+
+**Quick Download:** Use the provided script to download all files:
+```bash
+./download_from_zenodo.sh
+```
+
+The script will automatically:
+- Download checkpoints to `runs/specbridge_align_chemberta_pub_v3g_*/ckpt_*.pt`
+- Download datasets to `data/*.mgf`
+- Download candidates to `data/*.pkl`
+- Create necessary directories
+- Skip files that already exist
+
+**Note:** Files are restricted access. Please request access through the Zenodo record page if needed.
+
+### File Organization
+
+After downloading, files will be organized as:
+
+- **Checkpoints:**
+  - `runs/msgym/SpecBridge_MSGYM_checkpoint.pt`
+  - `runs/msnlib/SpecBridge_MSnLib_checkpoint.pt`
+  - `runs/spectraverse/SpecBridge_Spectraverse_checkpoint.pt`
+
+- **Datasets:**
+  - `data/SpecBridge_MassSpecGym_dataset.mgf`
+  - `data/SpecBridge_MSnLib_dataset.mgf`
+  - `data/SpecBridge_Spectraverse_dataset.mgf`
+
+- **Candidates:**
+  - `data/SpecBridge_MSGYM_candidates.pkl`
+  - `data/SpecBridge_MSnLib_candidates.pkl`
+  - `data/SpecBridge_Spectraverse_candidates.pkl`
+

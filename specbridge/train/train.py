@@ -1,12 +1,13 @@
 """
-SpecBridge entry script
-----------------------
-Thin shim that preserves the legacy script entry-point. For usage, prefer the
-installed CLI:
+SpecBridge Training Script
+--------------------------
+Main training script for SpecBridge adapter training.
 
+Usage:
+    python -m specbridge.train.train --mgf path/to/data.mgf --dreams-ckpt path/to/ckpt.pt ...
+
+Or use the CLI:
     specbridge --help
-
-This script forwards to the same training functions and remains runnable.
 """
 from __future__ import annotations
 from typing import Optional, Tuple, List, Iterable, Dict, Any
@@ -365,10 +366,8 @@ def train_real(args):
 
 
 
-    # Batching with K replicates per identity
-    sampler = BalancedBatchSampler(ds._records, batch_size=args.batch_size, K=args.K, shuffle=True)
-    
-
+    # Batching with K replicates per identity (currently unused - sampler is commented out)
+    # sampler = BalancedBatchSampler(ds._records, batch_size=args.batch_size, K=getattr(args, 'K', 4), shuffle=True)
     # sampler = ReplicateBatchSampler(ds._records, args.batch_size, K=args.supcon_k, seed=args.seed)
 
     loader = torch.utils.data.DataLoader(
@@ -454,30 +453,19 @@ def train_real(args):
         model.unfreeze_mol_last(n_layers=args.unfreeze_mol_last)
         print(f"[adapter] unfroze last {args.unfreeze_mol_last} layer(s) of molecule encoder (immediate)")
 
-    # Decoder/predictor (optional, default to Toy*)
-    if args.decoder_import:
-        DecoderClass = import_from_path(args.decoder_import)
-        decoder = DecoderClass(cond_dim=args.cond_dim).to(device)
-    else:
-        decoder = ToyDecoder(cond_dim=args.cond_dim, graph_dim=512).to(device)
-
-    if args.predictor_import:
-        PredictorClass = import_from_path(args.predictor_import)
-        spec_pred = PredictorClass(graph_dim=512, spec_bins=args.spec_bins).to(device)
-    else:
-        spec_pred = ToySpecPredictor(graph_dim=512, spec_bins=args.spec_bins).to(device)
-    cand_map = formula_bank = None
-    cand_featurizer = None
-    if args.train_candidates:
-        cand_map = _load_cand_map(args.train_candidates)
-        formula_bank = _build_formula_bank(cand_map, use_rdkit=args.iso_use_rdkit)
-        cand_featurizer = MolFeaturizer(fp_bits=args.fp_bits)
+    # Hard negative and isomer loss setup (currently unused)
+    # cand_map = formula_bank = None
+    # cand_featurizer = None
+    # if getattr(args, 'train_candidates', None):
+    #     cand_map = _load_cand_map(args.train_candidates)
+    #     formula_bank = _build_formula_bank(cand_map, use_rdkit=getattr(args, 'iso_use_rdkit', False))
+    #     cand_featurizer = MolFeaturizer(fp_bits=args.fp_bits)
 
     os.makedirs(args.outdir, exist_ok=True)
 
     # Optimizer / scaler
-    fwd_loss = ForwardSpectralLoss()
-    params = list(p for p in model.parameters() if p.requires_grad) + list(decoder.parameters()) + list(spec_pred.parameters())
+    # Note: decoder and spec_pred are not used in train_real (only used in train_demo)
+    params = list(p for p in model.parameters() if p.requires_grad)
     use_amp = bool(args.amp and torch.cuda.is_available() and not args.cpu)
     scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
 
@@ -486,11 +474,7 @@ def train_real(args):
     if args.resume and os.path.isfile(args.resume):
         ckpt = torch.load(args.resume, map_location="cpu")
         model.load_state_dict(ckpt.get("model", {}), strict=False)
-        try:
-            decoder.load_state_dict(ckpt.get("decoder", {}), strict=False)
-            spec_pred.load_state_dict(ckpt.get("spec_pred", {}), strict=False)
-        except Exception:
-            pass
+        # Note: decoder and spec_pred are not loaded in train_real (only used in train_demo)
         try:
             opt.load_state_dict(ckpt.get("opt", {}))
         except Exception as e:
@@ -666,8 +650,6 @@ def train_real(args):
                 if improved:
                     checkpoint_data = {
                         "model": model.state_dict(),
-                        "decoder": decoder.state_dict(),
-                        "spec_pred": spec_pred.state_dict(),
                         "opt": opt.state_dict(),
                         "step": step,
                         "args": vars(args),
@@ -700,8 +682,6 @@ def train_real(args):
                 checkpoint_path = os.path.join(args.outdir, f"ckpt_{step:06d}.pt")
                 checkpoint_data = {
                     "model": model.state_dict(),
-                    "decoder": decoder.state_dict(),
-                    "spec_pred": spec_pred.state_dict(),
                     "opt": opt.state_dict(),
                     "step": step,
                     "args": vars(args),
@@ -727,8 +707,6 @@ def train_real(args):
     checkpoint_path = os.path.join(args.outdir, f"last.pt")
     checkpoint_data = {
         "model": model.state_dict(),
-        "decoder": decoder.state_dict(),
-        "spec_pred": spec_pred.state_dict(),
         "opt": opt.state_dict(),
         "step": step,
         "args": vars(args),
@@ -759,10 +737,8 @@ if __name__ == "__main__":
     p.add_argument("--mapper-hidden", type=int, default=0, help="hidden dim for MapperB (0 = linear)")
     p.add_argument("--no-gaussian", action="store_true", help="disable Gaussian uncertainty in MapperB")
     p.add_argument("--batch-size", type=int, default=64)
-    p.add_argument("--steps", type=int, default=300)
+    p.add_argument("--steps", type=int, default=300, help="Steps for demo training (not used in real training)")
     p.add_argument("--lr", type=float, default=2e-4)
-    p.add_argument("--w-dec", type=float, default=0.0)
-    p.add_argument("--w-fwd", type=float, default=0.0)
     p.add_argument("--log-every", type=int, default=50)
     p.add_argument("--seed", type=int, default=1234)
     # Real data flags
@@ -776,8 +752,9 @@ if __name__ == "__main__":
     p.add_argument("--unfreeze-last", type=int, default=0, help="Unfreeze last N layers in DreaMS backbone")
     p.add_argument("--unfreeze-mol-last", type=int, default=0, help="Unfreeze last N layers in molecule encoder (ChemBERTa)")
     p.add_argument("--unfreeze-mol-after", type=int, default=0, help="Unfreeze molecule encoder after N steps (0=immediate/no-op)")
-    p.add_argument("--decoder-import", type=str, default=None, help="Optional 'module:Class' for your diffusion decoder")
-    p.add_argument("--predictor-import", type=str, default=None, help="Optional 'module:Class' for your spectrum predictor")
+    # Decoder/predictor imports (currently unused in train_real - kept for compatibility)
+    # p.add_argument("--decoder-import", type=str, default=None, help="Optional 'module:Class' for your diffusion decoder")
+    # p.add_argument("--predictor-import", type=str, default=None, help="Optional 'module:Class' for your spectrum predictor")
     p.add_argument("--num-workers", type=int, default=0, help="DataLoader workers; 0 avoids CUDA/fork issues")
     p.add_argument("--pin-memory", action="store_true", help="Pin host memory for faster H2D copies")
     p.add_argument("--persistent-workers", action="store_true", help="Keep workers alive between epochs (requires num-workers>0)")
@@ -794,7 +771,7 @@ if __name__ == "__main__":
     p.add_argument("--w-con", type=float, default=1.0, help="weight for InfoNCE alignment")
     p.add_argument("--w-map", type=float, default=5.0, help="weight for spec→mol mean regression")
     p.add_argument("--w-ortho", type=float, default=1e-3, help="weight for mapper orthogonality penalty")
-    p.add_argument("--K", type=int, default=4, help="#replicates per identity in each batch (BalancedBatchSampler)")
+    # p.add_argument("--K", type=int, default=4, help="#replicates per identity in each batch (BalancedBatchSampler) - currently unused")
     p.add_argument("--w-con-mapped", type=float, default=1.0,
                 help="weight for InfoNCE(mu_s, z_m)")
     p.add_argument("--allow-mol-update-in-con", action="store_true",
@@ -802,16 +779,17 @@ if __name__ == "__main__":
     p.add_argument("--supcon-k", type=int, default=4, help="replicates per SMILES per batch")
 
     p.add_argument("--freeze-mol-adapter", action="store_true")
-    p.add_argument("--w-hard", type=float, default=1.0, help="weight for hard-negative in-batch CE on mu_s vs z_m")
-    p.add_argument("--hard-topk", type=int, default=8, help="#hard negatives per anchor from fingerprint similarity")
-    p.add_argument("--hard-temp", type=float, default=0.07, help="temperature for hard-negative CE")
-    p.add_argument("--train-candidates", type=str, default=None,
-                help="PKL {true_smi: [cand_smiles,...]} to mine same-formula negatives")
-    p.add_argument("--w-iso", type=float, default=1.0, help="weight for same-formula isomer CE")
-    p.add_argument("--iso-k", type=int, default=8, help="# same-formula negatives per anchor")
-    p.add_argument("--iso-temp", type=float, default=0.07, help="temperature for isomer CE")
-    p.add_argument("--iso-use-rdkit", action="store_true",
-                help="derive formula from SMILES with RDKit; else fall back to dataset string formula")
+    # Hard negative and isomer loss parameters (currently unused - commented out in loss calculation)
+    # p.add_argument("--w-hard", type=float, default=1.0, help="weight for hard-negative in-batch CE on mu_s vs z_m")
+    # p.add_argument("--hard-topk", type=int, default=8, help="#hard negatives per anchor from fingerprint similarity")
+    # p.add_argument("--hard-temp", type=float, default=0.07, help="temperature for hard-negative CE")
+    # p.add_argument("--train-candidates", type=str, default=None,
+    #             help="PKL {true_smi: [cand_smiles,...]} to mine same-formula negatives")
+    # p.add_argument("--w-iso", type=float, default=1.0, help="weight for same-formula isomer CE")
+    # p.add_argument("--iso-k", type=int, default=8, help="# same-formula negatives per anchor")
+    # p.add_argument("--iso-temp", type=float, default=0.07, help="temperature for isomer CE")
+    # p.add_argument("--iso-use-rdkit", action="store_true",
+    #             help="derive formula from SMILES with RDKit; else fall back to dataset string formula")
     p.add_argument("--mol-space", choices=["ecfp", "chemberta", "adapter"], default="ecfp")
     p.add_argument("--chemberta-model", type=str, default="seyonec/ChemBERTa-zinc-base-v1")
     p.add_argument('--val-every', type=int, default=1000, help='steps between val checks')

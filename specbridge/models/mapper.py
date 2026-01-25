@@ -4,8 +4,10 @@ import torch.nn as nn
 from typing import Optional, Tuple
 from specbridge.utils.common import unit_normalize
 from specbridge.adapters.dreams_adapter import DreamsAdapter
-from specbridge.losses.contrastive import InfoNCELoss, _embed_smiles_list, isomer_ce
-from specbridge.losses.supcon import supcon_loss
+from specbridge.losses.contrastive import InfoNCELoss
+# Unused losses (commented out in align_losses):
+# from specbridge.losses.contrastive import _embed_smiles_list, isomer_ce
+# from specbridge.losses.supcon import supcon_loss
 
 import torch.nn.functional as F
 

@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = REPO_ROOT / "dreams_condition_adapter.py"
+SCRIPT = REPO_ROOT / "specbridge" / "train" / "train.py"
 
 def main():
     # Execute the existing script's CLI in-process to preserve flags/behavior

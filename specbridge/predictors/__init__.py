@@ -1,1 +1,1 @@
-from .toy import ToySpecPredictor
+"""Predictors for spectrum prediction."""

@@ -2,16 +2,17 @@
 set -uo pipefail
 
 # ========= Edit these to match your run =========
-RUN_DIR="runs/optional_ablations_spectraverse/procrustes_random_init"            # folder with ckpt_*.pt
-# MGF="/cluster/tufts/liulab/yiwan01/SpecBridge/data/MSnLib/combined_ms2_with_folds.mgf"
-MGF="/cluster/tufts/liulab/yiwan01/SpecBridge/data/spectraverse_clean.mgf"
-DREAMS="/cluster/tufts/liulab/yiwan01/SpecBridge/data/ssl_model.ckpt"
-# CANDS="/cluster/tufts/liulab/yiwan01/massspecgym/cand_dict_large_form.pkl"
-CANDS="/cluster/tufts/liulab/yiwan01/SpecBridge/data/cand_dict_large_smiles.pkl"
-CANDS="/cluster/tufts/liulab/yiwan01/SpecBridge/data/MassSpecGym_retrieval_candidates_formula.json"
-CANDS="/cluster/tufts/liulab/yiwan01/SpecBridge/data/candidates_test_val.pkl"
-# CANDS="/cluster/tufts/liulab/yiwan01//SpecBridge/data/cand_dict_merged.pkl"
-# CANDS="/cluster/tufts/liulab/yiwan01/SpecBridge/data/candidates_msnlib.pkl"
+RUN_DIR="runs/specbridge_align_chemberta_pub_v3g_spectraverse_mapper_spec"            # folder with ckpt_*.pt
+# MGF="data/MSnLib/combined_ms2_with_folds.mgf"  # MSnLib dataset
+MGF="data/spectraverse_clean.mgf"  # Spectraverse dataset
+DREAMS="data/ssl_model.ckpt"
+# Candidate files (uncomment the one matching your MGF dataset):
+# CANDS="../massspecgym/cand_dict_large_form.pkl"  # MassSpecGym (external)
+CANDS="data/cand_dict_large_smiles.pkl"  # MSGYM dataset
+# CANDS="data/MassSpecGym_retrieval_candidates_formula.json"  # MassSpecGym (JSON format)
+CANDS="data/candidates_test_val.pkl"  # Spectraverse dataset
+# CANDS="data/cand_dict_merged.pkl"  # Merged dataset
+# CANDS="data/candidates_msnlib.pkl"  # MSnLib dataset
 FOLD="val"
 BATCH=128
 LIMIT=100000
@@ -21,7 +22,7 @@ MOL_SPACE="chemberta"                                 # chemberta | ecfp | adapt
 N_BLOCKS=8
 COND_DIM=2048
 MAPPER_HIDDEN=2048
-CACHE="/cluster/tufts/liulab/yiwan01/SpecBridge/cache/cands_${FOLD}_chemberta_pub_v3g_spectraverse.pt"
+CACHE="cache/cands_${FOLD}_chemberta_pub_v3g_spectraverse.pt"
 CHEMBERTA_MODEL="Derify/ChemBERTa_augmented_pubchem_13m"
 # CHEMBERTA_MODEL="Derify/ChemBERTa-druglike"
 # CHEMBERTA_MODEL="laituan245/molt5-base"
@@ -29,7 +30,7 @@ CHEMBERTA_MODEL="Derify/ChemBERTa_augmented_pubchem_13m"
 # MOL_SPACE="ecfp"
 # COND_DIM=1024
 # MAPPER_HIDDEN=1024
-# CACHE="/cluster/tufts/liulab/yiwan01/SpecBridge/cache/cands_test_ecfp_r2_2048.pt"
+# CACHE="cache/cands_test_ecfp_r2_2048.pt"
 # ECFP_BITS=2048
 # ECFP_RADIUS=2
 
@@ -37,7 +38,7 @@ CHEMBERTA_MODEL="Derify/ChemBERTa_augmented_pubchem_13m"
 # MOL_SPACE="adapter"
 # COND_DIM=1024
 # MAPPER_HIDDEN=1024
-# CACHE="/cluster/tufts/liulab/yiwan01/SpecBridge/cache/cands_test_adapter.pt"
+# CACHE="cache/cands_test_adapter.pt"
 
 # ========= Output files =========
 OUTCSV="${RUN_DIR}/eval_summary_${FOLD}_all.csv"
@@ -76,10 +77,10 @@ for CK in "${RUN_DIR}"/*.pt; do
   STEP=$(basename "${CK}" | sed -E 's/ckpt_0*([0-9]+)\.pt/\1/')
   
   # Skip checkpoints before step 30000
-  if [[ ${STEP} -lt 30000 ]]; then
-    echo ">>> Skipping ${CK} (step ${STEP} < 30000)"
-    continue
-  fi
+#   if [[ ${STEP} -lt 30000 ]]; then
+#     echo ">>> Skipping ${CK} (step ${STEP} < 30000)"
+#     continue
+#   fi
   
   LOG="${LOGDIR}/eval_${STEP}.log"
 
@@ -106,20 +107,32 @@ for CK in "${RUN_DIR}"/*.pt; do
   fi
 
   # Parse metrics from the log
-  R1=$(awk '/R@1:/  {print $2}'  "${LOG}")
-  R5=$(awk '/R@5:/  {print $2}'  "${LOG}")
-  R20=$(awk '/R@20:/ {print $2}' "${LOG}")
-  MRR=$(awk '/MRR:/  {print $2}' "${LOG}")
-  MED=$(awk '/median_rank:/ {print $2}' "${LOG}")
+  R1=$(awk '/R@1:/  {print $2}'  "${LOG}" || echo "NA")
+  R5=$(awk '/R@5:/  {print $2}'  "${LOG}" || echo "NA")
+  R20=$(awk '/R@20:/ {print $2}' "${LOG}" || echo "NA")
+  MRR=$(awk '/MRR:/  {print $2}' "${LOG}" || echo "NA")
+  MED=$(awk '/median_rank:/ {print $2}' "${LOG}" || echo "NA")
   # parse the [eval] line
   # [eval] total_queries=1000 | evaluated=1000 | ...
-  TOT=$(awk -F'[=| ]+' '/^\[eval\]/ {for(i=1;i<=NF;i++) if($i ~ /total_queries/) print $(i+1)}' "${LOG}")
-  EVD=$(awk -F'[=| ]+' '/^\[eval\]/ {for(i=1;i<=NF;i++) if($i ~ /evaluated/) print $(i+1)}' "${LOG}")
+  TOT=$(awk -F'[=| ]+' '/^\[eval\]/ {for(i=1;i<=NF;i++) if($i ~ /total_queries/) print $(i+1)}' "${LOG}" || echo "NA")
+  EVD=$(awk -F'[=| ]+' '/^\[eval\]/ {for(i=1;i<=NF;i++) if($i ~ /evaluated/) print $(i+1)}' "${LOG}" || echo "NA")
+
+  # Ensure all variables are set (default to NA if empty)
+  R1="${R1:-NA}"
+  R5="${R5:-NA}"
+  R20="${R20:-NA}"
+  MRR="${MRR:-NA}"
+  MED="${MED:-NA}"
+  TOT="${TOT:-NA}"
+  EVD="${EVD:-NA}"
 
   echo "${CK},${STEP},${R1},${R5},${R20},${MRR},${MED},${TOT},${EVD}" >> "${OUTCSV}"
 done
 
 echo "Summary written to: ${OUTCSV}"
 echo "Top 5 by R@5:"
-# pretty print top 5 by R@1
+# pretty print top 5 by R@5 (column 4)
+# Note: The best checkpoint is typically the one with highest R@5 or MRR
 ( head -n1 "${OUTCSV}"; tail -n +2 "${OUTCSV}" | sort -t',' -k4,4gr ) | head -n6 | column -s, -t
+echo ""
+echo "To find the best checkpoint, check the CSV file and look for highest R@5 or MRR values."

@@ -305,8 +305,9 @@ def main():
                     help="Use mu (no sampling) for mapped queries.")
     ap.add_argument("--mol-space", choices=["adapter", "ecfp", "chemberta"], default="adapter",
                 help="Embedding space for molecule candidates/true SMILES.")
-    ap.add_argument("--ecfp-radius", type=int, default=2,
-                    help="ECFP radius when --mol-space=ecfp.")
+    # ECFP mode is currently not implemented in build_mol_embed_fn
+    # ap.add_argument("--ecfp-radius", type=int, default=2,
+    #                 help="ECFP radius when --mol-space=ecfp.")
     ap.add_argument("--chemberta-model", type=str, default="seyonec/ChemBERTa-zinc-base-v1",
                     help="HF model id when --mol-space=chemberta.")
     ap.add_argument("--compute-mces", action="store_true",

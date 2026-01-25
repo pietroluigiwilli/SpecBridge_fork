@@ -18,7 +18,6 @@ try:
     if 'RDBASE' not in os.environ:
         # Try common conda environment paths
         possible_paths = [
-            '/cluster/tufts/liulab/yiwan01/miniconda3/envs/specbridge',
             os.path.expanduser('~/miniconda3/envs/specbridge'),
             os.path.expanduser('~/anaconda3/envs/specbridge'),
         ]
