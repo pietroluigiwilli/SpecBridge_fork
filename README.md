@@ -214,8 +214,6 @@ The script will automatically:
 - Create necessary directories
 - Skip files that already exist
 
-**Note:** Files are restricted access. Please request access through the Zenodo record page if needed.
-
 ### File Organization
 
 After downloading, files will be organized as:
