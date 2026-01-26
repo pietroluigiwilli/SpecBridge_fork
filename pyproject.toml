@@ -20,7 +20,7 @@ rdkit = ["rdkit-pypi>=2022.9.5"]
 dreams = ["wandb>=0.16.4"]
 
 [tool.setuptools]
-packages = ["specbridge", "molgpt"]
+packages = ["specbridge"]
 
 [project.scripts]
 specbridge = "specbridge.cli:main"
