@@ -1,7 +1,5 @@
 README.md
 pyproject.toml
-molgpt/__init__.py
-molgpt/convert_shards_to_molgpt.py
 specbridge/__init__.py
 specbridge/cli.py
 specbridge/run.py
@@ -19,9 +17,6 @@ specbridge/data/sampler.py
 specbridge/decoders/__init__.py
 specbridge/decoders/toy.py
 specbridge/eval/candidates.py
-specbridge/eval/generator.py
-specbridge/eval/replicates.py
-specbridge/eval/retrieval.py
 specbridge/losses/__init__.py
 specbridge/losses/contrastive.py
 specbridge/losses/forward.py
