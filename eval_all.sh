@@ -41,7 +41,7 @@ CHEMBERTA_MODEL="Derify/ChemBERTa_augmented_pubchem_13m"
 # CACHE="cache/cands_test_adapter.pt"
 
 # ========= Output files =========
-OUTCSV="${RUN_DIR}/eval_summary_${FOLD}.csv"
+OUTCSV="${RUN_DIR}/eval_summary_${FOLD}_all.csv"
 LOGDIR="${RUN_DIR}/eval_logs"
 mkdir -p "${LOGDIR}"
 

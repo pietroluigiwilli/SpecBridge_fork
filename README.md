@@ -1,5 +1,9 @@
 # SpecBridge: Bridging Mass Spectrometry and Molecular Representations via Cross-Modal Alignment
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18357418.svg)](https://doi.org/10.5281/zenodo.18357418)
+[![Hugging Face](https://img.shields.io/badge/🤗%20Hugging%20Face-Model-blue)](https://huggingface.co/Spony/SpecBridge)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 SpecBridge provides a DreaMS-conditioned adapter for spectra->molecule mapping and a training pipeline with synthetic and real (MGF) data.
 
 ![SpecBridge Overview](assets/specbridge_overview.png)
@@ -36,6 +40,8 @@ For detailed setup instructions, troubleshooting, and alternative installation m
 **DreaMS pre-trained weights** are available at: [https://zenodo.org/records/10997887](https://zenodo.org/records/10997887)
 
 **SpecBridge pre-trained adapters, datasets, and candidate files** are available at: [https://zenodo.org/records/18357418](https://zenodo.org/records/18357418) (DOI: [10.5281/zenodo.18357418](https://doi.org/10.5281/zenodo.18357418))
+
+**SpecBridge model weights** are also available on Hugging Face: [https://huggingface.co/Spony/SpecBridge](https://huggingface.co/Spony/SpecBridge) (weights only)
 
 ### Datasets and Candidate Files
 
@@ -161,6 +167,8 @@ Pre-trained SpecBridge adapter checkpoints, datasets, and candidate files are av
 
 **[📦 Download from Zenodo](https://zenodo.org/records/18357418)** | DOI: [10.5281/zenodo.18357418](https://doi.org/10.5281/zenodo.18357418)
 
+**Model weights are also available on [Hugging Face](https://huggingface.co/Spony/SpecBridge)** (weights only; datasets and candidates are on Zenodo).
+
 The Zenodo dataset includes:
 
 ### Best Performing Checkpoints (Validation Set)
@@ -233,3 +241,19 @@ After downloading, files will be organized as:
   - `data/SpecBridge_MSnLib_candidates.pkl`
   - `data/SpecBridge_Spectraverse_candidates.pkl`
 
+
+## Citation
+
+If you use SpecBridge in your research, please cite:
+
+```bibtex
+@misc{wang2026specbridgebridgingmassspectrometry,
+      title={SpecBridge: Bridging Mass Spectrometry and Molecular Representations via Cross-Modal Alignment}, 
+      author={Yinkai Wang and Yan Zhou Chen and Xiaohui Chen and Li-Ping Liu and Soha Hassoun},
+      year={2026},
+      eprint={2601.17204},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2601.17204}, 
+}
+```
