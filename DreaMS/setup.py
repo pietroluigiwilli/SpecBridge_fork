@@ -1,18 +1,14 @@
 import os
-import sys
 from setuptools import setup, find_packages
 
 # Get the long description from the README file
 here = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(here, "README.md"), encoding="utf-8") as f:
-    long_description = f.read()
-
-# Platform-specific pyopenms version (TMP workaround for macOS)
-def get_pyopenms_dep():
-    if sys.platform.lower().startswith("darwin"):
-        return "pyopenms==3.3.0"  # macOS
-    else:  # sys.platform.lower().startswith("linux"):
-        return "pyopenms==3.4.0"  # Linux or other platforms
+readme_path = os.path.join(here, "README.md")
+if os.path.exists(readme_path):
+    with open(readme_path, encoding="utf-8") as f:
+        long_description = f.read()
+else:
+    long_description = "DreaMS (Deep Representations Empowering the Annotation of Mass Spectra)"
 
 setup(
     name="dreams",
@@ -25,23 +21,23 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/pluskal-lab/DreaMS",
     install_requires=[
-        "numpy==1.25.0",
-        "numba==0.58.0",
+        "numpy==1.24.4",
+        "numba==0.57.1",
         "torch==2.2.1",
         "pytorch-lightning==2.0.8",
         "torchmetrics==1.3.2",
         "pandas==2.2.1",
         "pyarrow==15.0.2",
         "h5py==3.11.0",
-        "rdkit==2023.9.6",
+        "rdkit==2023.9.5",
         "umap-learn==0.5.6",
         "seaborn==0.13.2",
         "plotly==5.20.0",
         "ase==3.22.1",
         "wandb==0.16.4",
         "pandarallel==1.6.5",
-        "matchms==0.27.0",
-        get_pyopenms_dep(),
+        "matchms==0.24.2",
+        "pyopenms==3.0.0",
         "igraph==0.11.4",
         "molplotly==1.1.7",
         "fire==0.6.0",
@@ -60,14 +56,11 @@ setup(
             "jupyter==1.0.0",
             "ipywidgets==8.1.3",
         ],
-        # "search": [
-        #     "faiss-cpu==1.9.0",
-        # ],
     },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.10.13'
+    python_requires='>=3.11',
 )

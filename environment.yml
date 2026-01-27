@@ -1,4 +1,4 @@
-name: specbridge
+name: specbridge_test
 channels:
   - conda-forge
   - defaults
