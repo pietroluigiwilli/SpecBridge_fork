@@ -38,6 +38,16 @@ declare -A FILE_MAP=(
     ["SpecBridge_Spectraverse_candidates.pkl"]="data/SpecBridge_Spectraverse_candidates.pkl"
 )
 
+# Determine which Python to use
+if command -v python3 >/dev/null 2>&1; then
+    PYTHON_CMD=python3
+elif command -v python >/dev/null 2>&1; then
+    PYTHON_CMD=python
+else
+    echo "❌ Failed to find a Python interpreter (python3 or python)."
+    exit 1
+fi
+
 # Get file list from Zenodo
 echo "📦 Fetching file list from Zenodo..."
 FILES_JSON=$(curl -s "${ZENODO_URL}")
@@ -56,7 +66,7 @@ for zenodo_name in "${!FILE_MAP[@]}"; do
     local_path="${FILE_MAP[$zenodo_name]}"
     
     # Extract download URL for this file
-    download_url=$(echo "$FILES_JSON" | python3 -c "
+    download_url=$(echo "$FILES_JSON" | "$PYTHON_CMD" -c "
 import sys, json
 data = json.load(sys.stdin)
 for f in data.get('files', []):
@@ -89,7 +99,7 @@ for f in data.get('files', []):
     echo "   → ${local_path}"
     
     # Get file size for progress
-    file_size=$(echo "$FILES_JSON" | python3 -c "
+    file_size=$(echo "$FILES_JSON" | "$PYTHON_CMD" -c "
 import sys, json
 data = json.load(sys.stdin)
 for f in data.get('files', []):
