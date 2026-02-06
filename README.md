@@ -119,6 +119,30 @@ After training, you can use `eval_all.sh` to automatically evaluate all checkpoi
 ./eval_all.sh
 ```
 
+### Notebook Inference
+
+To run predictions directly from a Jupyter notebook with downloaded checkpoints, use the lightweight helper:
+
+```python
+from specbridge.notebook import SpecBridgeNotebookPredictor
+
+# Initialize with your local checkpoint paths
+predictor = SpecBridgeNotebookPredictor(
+    dreams_ckpt="runs/msgym/ssl_model.ckpt",
+    adapter_ckpt="runs/msgym/checkpoint.ckpt",
+    device="cuda"  # or "cpu"
+)
+
+# Provide candidate SMILES once (cached internally)
+predictor.embed_candidates(["CCO", "CCN", "c1ccccc1"])
+
+# mz/intensity can come from an MGF entry or any spectrum
+result = predictor.predict(mz_array, intensity_array, top_k=3)
+print(result["predicted_smiles"])
+```
+
+`mz_array` and `intensity_array` should be 1D arrays or tensors of equal length. Intensities are normalized by default before binning to match training-time preprocessing.
+
 The script will:
 - Loop through all checkpoints (`ckpt_*.pt`) in the run directory
 - Evaluate each checkpoint on the specified dataset
