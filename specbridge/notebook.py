@@ -7,7 +7,7 @@ from Python (e.g., inside a Jupyter notebook) without invoking the CLI script.
 from __future__ import annotations
 
 from types import SimpleNamespace
-from typing import Dict, List, Sequence
+from typing import Dict, List, Sequence, Set
 
 import torch
 import torch.nn.functional as F
@@ -19,6 +19,8 @@ from specbridge.eval.predict_smiles import (
     collate_with_feature_id,
 )
 from specbridge.utils.common import set_seed
+
+DUMMY_SMILES = "C"
 
 
 class SpecBridgeNotebookPredictor:
@@ -32,7 +34,25 @@ class SpecBridgeNotebookPredictor:
             device="cuda"  # or "cpu"
         )
         predictor.embed_candidates(["CCO", "CCN"])
-        result = predictor.predict(mz_array, intensity_array, top_k=3)
+        # Provide your own spectrum arrays (1D m/z and intensity values)
+        result = predictor.predict(your_mz_values, your_intensity_values, top_k=3)
+    
+    Args:
+        dreams_ckpt: Path to the DreaMS checkpoint (ssl_model.ckpt).
+        adapter_ckpt: Path to the SpecBridge adapter checkpoint.
+        device: Target device; defaults to CUDA if available.
+        spec_bins: Number of spectral bins (matches training setup).
+        cond_dim: SpecBridge conditioning dimension.
+        mapper_hidden: Hidden size for the mapper network.
+        n_blocks: Residual mapper blocks (matches training default of 8).
+        mol_space: Molecule embedding space (ChemBERTa supported).
+        chemberta_model: Hugging Face ChemBERTa model name.
+        no_gaussian: Disable Gaussian sampling in the mapper.
+        formula_vocab: One-hot vocab size for formulas; keep defaults for pretrained checkpoints.
+        adduct_vocab: One-hot vocab size for adducts; keep defaults for pretrained checkpoints.
+        charge_vocab: One-hot vocab size for charges; keep defaults for pretrained checkpoints.
+        fp_bits: Fingerprint length used for placeholder molecule features.
+        seed: Random seed for reproducibility.
     """
 
     def __init__(
@@ -54,6 +74,7 @@ class SpecBridgeNotebookPredictor:
         charge_vocab: int = 8,
         fp_bits: int = 2048,
     ):
+        set_seed(seed)
         self.device = torch.device(device or ("cuda" if torch.cuda.is_available() else "cpu"))
         self.formula_vocab = formula_vocab
         self.adduct_vocab = adduct_vocab
@@ -73,7 +94,6 @@ class SpecBridgeNotebookPredictor:
             no_gaussian=no_gaussian,
             n_blocks=n_blocks,
         )
-        set_seed(seed)
         self.model = build_model(args, self.device)
         self.embed_fn = build_mol_embed_fn(args, self.model, self.device)
 
@@ -83,21 +103,29 @@ class SpecBridgeNotebookPredictor:
     def embed_candidates(self, candidates: Sequence[str], *, batch_size: int = 512) -> List[str]:
         """Pre-compute and cache candidate embeddings (canonicalized)."""
         uniq: List[str] = []
-        seen: set[str] = set()
+        seen: Set[str] = set()
         for smi in candidates:
             canon = _canon_smi(smi) or smi
             if canon not in seen:
                 uniq.append(canon)
                 seen.add(canon)
+        # Reuse cached embeddings if candidate list is unchanged.
+        if self._cand_smiles == uniq:
+            return uniq
         if not uniq:
             self._cand_smiles = []
-            self._cand_embeddings = torch.empty((0, 1), dtype=torch.float32)
+            self._cand_embeddings = None
             return []
 
-        Z = self.embed_fn(uniq, self.device, bs=batch_size)
+        Z = F.normalize(self.embed_fn(uniq, self.device, bs=batch_size), dim=-1)
         self._cand_smiles = uniq
         self._cand_embeddings = Z
         return uniq
+
+    def _compute_mapped(self, mu: torch.Tensor, lv: torch.Tensor | None, deterministic_map: bool) -> torch.Tensor:
+        if lv is None or deterministic_map:
+            return mu
+        return self.model.mapB.sample(mu, lv, deterministic=False)
 
     def _make_batch(
         self,
@@ -125,9 +153,9 @@ class SpecBridgeNotebookPredictor:
                 "charge_idx": None,
                 "nce": None,
                 "instrument": None,
-                "smi_key": "C",
+                "smi_key": DUMMY_SMILES,
             },
-            "smiles": "C",
+            "smiles": DUMMY_SMILES,
         }
         return collate_with_feature_id(
             [rec],
@@ -162,12 +190,14 @@ class SpecBridgeNotebookPredictor:
             top_k: number of top predictions to return.
             normalize_intensities: divide intensities by max value before binning.
             title: identifier for the spectrum (used in outputs only).
-            use_mapped: use mapped spectrum embedding (recommended).
-            deterministic_map: use mean of Gaussian mapper (no sampling).
+            use_mapped: when False, try spectrum-space embedding if its dimension matches
+                candidate embeddings; otherwise fall back to the mapped embedding.
+            deterministic_map: controls sampling in the mapper; also affects the fallback
+                path when ``use_mapped`` is False but a mapped embedding is required.
         """
         if candidates is not None:
             self.embed_candidates(candidates)
-        if self._cand_embeddings is None or self._cand_smiles is None:
+        if self._cand_smiles is None:
             raise ValueError("No candidates provided. Call embed_candidates() or pass candidates to predict().")
         if len(self._cand_smiles) == 0:
             return {
@@ -179,20 +209,27 @@ class SpecBridgeNotebookPredictor:
                 "all_scores": [],
                 "status": "no_candidates",
             }
+        if self._cand_embeddings is None:
+            raise ValueError("Candidate embeddings are missing. Call embed_candidates() first.")
 
         batch = self._make_batch(mz, intensity, normalize_intensities=normalize_intensities, title=title)
         spectra = batch["spectra"].to(self.device)
         meta = {k: (v.to(self.device) if torch.is_tensor(v) else v) for k, v in batch["meta"].items()}
-        meta["smi_key"] = meta.get("smi_key", ["C"])
-
-        z_s, z_m, z_hat, mu, lv = self.model(spectra, meta, None, inference=True)
-        if use_mapped:
-            z_query = mu if (deterministic_map or lv is None) else self.model.mapB.sample(mu, lv, deterministic=True)
-        else:
-            z_query = mu if (deterministic_map or lv is None) else self.model.mapB.sample(mu, lv, deterministic=True)
+        meta["smi_key"] = meta.get("smi_key", [DUMMY_SMILES])
 
         cand_emb = self._cand_embeddings.to(self.device)
-        sims = (F.normalize(z_query, dim=-1) @ F.normalize(cand_emb, dim=-1).T).squeeze(0)
+        z_s, z_m, z_hat, mu, lv = self.model(spectra, meta, None, inference=True)
+        if use_mapped:
+            z_query = self._compute_mapped(mu, lv, deterministic_map)
+        else:
+            # Only fall back to z_s (spectrum space) if it already matches
+            # the candidate embedding dimensionality (i.e., is compatible with the candidate space).
+            if z_s.shape[-1] == cand_emb.shape[-1]:
+                z_query = z_s
+            else:
+                z_query = self._compute_mapped(mu, lv, deterministic_map)
+
+        sims = (F.normalize(z_query, dim=-1) @ cand_emb.T).squeeze(0)
         order = torch.argsort(sims, descending=True)
         k = min(top_k, len(order))
         top_smiles = [self._cand_smiles[i] for i in order[:k]]
