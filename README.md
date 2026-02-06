@@ -126,6 +126,31 @@ The script will:
 - Skip checkpoints that have already been evaluated
 - Display the top 5 checkpoints by R@5
 
+### Notebook Inference
+
+To run predictions directly from a Jupyter notebook with downloaded checkpoints, use the lightweight helper:
+
+```python
+from specbridge.notebook import SpecBridgeNotebookPredictor
+
+# Initialize with your local checkpoint paths
+predictor = SpecBridgeNotebookPredictor(
+    dreams_ckpt="runs/msgym/ssl_model.ckpt",
+    adapter_ckpt="runs/msgym/checkpoint.ckpt",
+    device="cuda"  # or "cpu"
+)
+
+# Provide candidate SMILES once (cached internally)
+predictor.embed_candidates(["CCO", "CCN", "c1ccccc1"])
+
+# mz/intensity can come from an MGF entry or any spectrum
+mz, intensity = ...  # 1D arrays or tensors
+result = predictor.predict(mz, intensity, top_k=3)
+print(result["predicted_smiles"])
+```
+
+`mz` and `intensity` should be 1D arrays or tensors of equal length. Intensities are normalized by default before binning to match training-time preprocessing.
+
 ### Evaluation
 
 To evaluate a single checkpoint on a dataset with candidates:
