@@ -658,7 +658,13 @@ class SpecBridgePredictor:
         all_candidate_smiles = set()
         for fid, cand_list in self.candidates_dict.items():
             if isinstance(cand_list, list):
-                all_candidate_smiles.update(cand_list)
+                for item in cand_list:
+                    if isinstance(item, list):
+                        all_candidate_smiles.update(item)
+                    else:
+                        all_candidate_smiles.add(item)
+            else:
+                all_candidate_smiles.add(cand_list)
         all_candidate_smiles = sorted(list(all_candidate_smiles))
         print(f"[embedding] Found {len(all_candidate_smiles)} unique candidate SMILES")
         
@@ -694,6 +700,8 @@ class SpecBridgePredictor:
             dummy_smiles = ["C"] * B
             meta_with_smiles = meta.copy()
             meta_with_smiles["smi_key"] = dummy_smiles
+
+            print(meta_with_smiles) # TESTING,  DELETE LATER
             
             z_s, z_m, z_hat, mu, lv = self.model(s, meta_with_smiles, None, inference=True)
             
